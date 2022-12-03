@@ -1,0 +1,33 @@
+{
+    "logpath": "/Users/rxlx/grpc.log",
+    "zinc_uri": "http://127.0.0.1:4080/api/_bulkv2",
+    "services": {
+        "rtsc_monitor": {
+            "name": "real time system conditions monitor",
+            "index": "ercotsRTSC",
+            "runtime": 28800,
+            "refresh": 300,
+            "scheduled": true,
+            "start_at": ["16:20", "America/Chicago"],
+            "rerun": true
+        },
+        "spp_monitor": {
+            "name": "real time settlement point prices monitor",
+            "index": "ErcotSPP",
+            "runtime": 28800,
+            "refresh": 180,
+            "scheduled": false,
+            "start_at": ["13:42", "America/Chicago"],
+            "rerun": true
+        },
+        "wapi_monitor": {
+            "name": "weather montior",
+            "index": "verySpecialWeather",
+            "runtime": 86400,
+            "refresh": 1800,
+            "scheduled": false,
+            "start_at": ["13:42", "America/Chicago"],
+            "rerun": true
+        }
+    }
+}
