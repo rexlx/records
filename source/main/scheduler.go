@@ -42,7 +42,7 @@ func (s *ServiceDetails) Run(c chan definitions.ZincRecordV2, wkr func(c chan de
 
 	uid := uuid.Must(uuid.NewRandom()).String()
 	app.registerService(s.Name, uid, *s.Store)
-	app.InfoLog.Printf("new service registered: %v -> %v", s.Name, uid)
+	app.InfoLog.Printf("new service registered: %v -> %v", uid, s.Name)
 
 	s.ServiceId = uid
 	t, z := s.StartAt[0], s.StartAt[1]
