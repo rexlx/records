@@ -23,7 +23,7 @@ func (app *Application) removeService(uid string) {
 	delete(app.Db, uid)
 }
 
-func (app *Application) getServices() []Store {
+func (app *Application) getAllServiceData() []Store {
 	var svs []Store
 	app.Mtx.RLock()
 	defer app.Mtx.RUnlock()
@@ -33,9 +33,8 @@ func (app *Application) getServices() []Store {
 	return svs
 }
 
-func (app *Application) getServiceById(uid string) *Store {
-	store := app.Db[uid]
-	return store
+func (app *Application) getServiceDataById(uid string) *Store {
+	return app.Db[uid]
 }
 
 func serviceValidator(s *ServiceDetails) error {

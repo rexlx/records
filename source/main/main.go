@@ -76,7 +76,7 @@ func main() {
 	AppReceiver(&app)
 	app.startServcies()
 	for {
-		serviceList := app.getServices()
+		serviceList := app.getAllServiceData()
 		if len(serviceList) > 0 {
 			app.InfoLog.Println("performing service health check")
 			for k, v := range app.ServiceRegistry {
