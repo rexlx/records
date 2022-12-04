@@ -80,7 +80,7 @@ func main() {
 		if len(serviceList) > 0 {
 			app.InfoLog.Println("performing service health check")
 			for k, v := range app.ServiceRegistry {
-				app.InfoLog.Printf("%v (%v) is running", k, v)
+				app.InfoLog.Printf("%v (%v) is running. store is: %v", k, v, len(app.Db[v].Records))
 			}
 			time.Sleep(1800 * time.Second)
 		} else {

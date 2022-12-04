@@ -45,12 +45,13 @@ func serviceValidator(s *ServiceDetails) error {
 }
 
 func (app *Application) handleStore(uid string, store *Store) {
-	var emptyStore []*definitions.ZincRecordV2
-	services.SaveRecordToZinc(*store.Records[len(store.Records)-1], app.ErrorLog)
-
-	if len(store.Records) > 29 {
-		app.saveStore(store)
-		store.Records = emptyStore
+	if len(store.Records) > 0 {
+		services.SaveRecordToZinc(*store.Records[len(store.Records)-1], app.ErrorLog)
+		if len(store.Records) > 99 {
+			var emptyStore []*definitions.ZincRecordV2
+			app.saveStore(store)
+			store.Records = emptyStore
+		}
 	}
 
 	app.Db[uid] = store
