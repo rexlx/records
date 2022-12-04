@@ -12,14 +12,15 @@ import (
 )
 
 type Application struct {
-	InfoLog    *log.Logger
-	ErrorLog   *log.Logger
-	Config     RuntimeConfig
-	RtscStream chan definitions.ZincRecordV2
-	SppStream  chan definitions.ZincRecordV2
-	WapiStream chan definitions.ZincRecordV2
-	Db         map[string]*Store
-	Mtx        sync.RWMutex
+	InfoLog         *log.Logger
+	ErrorLog        *log.Logger
+	Config          RuntimeConfig
+	ServiceRegistry map[string]string
+	RtscStream      chan definitions.ZincRecordV2
+	SppStream       chan definitions.ZincRecordV2
+	WapiStream      chan definitions.ZincRecordV2
+	Db              map[string]*Store
+	Mtx             sync.RWMutex
 }
 
 type RuntimeConfig struct {
@@ -59,16 +60,18 @@ func main() {
 	sppStream := make(chan definitions.ZincRecordV2)
 	wapiStream := make(chan definitions.ZincRecordV2)
 	database := make(map[string]*Store)
+	serviceRegistry := make(map[string]string)
 
 	app := Application{
-		Config:     config,
-		InfoLog:    infoLog,
-		ErrorLog:   errorLog,
-		RtscStream: rtscStream,
-		SppStream:  sppStream,
-		WapiStream: wapiStream,
-		Db:         database,
-		Mtx:        sync.RWMutex{},
+		Config:          config,
+		ServiceRegistry: serviceRegistry,
+		InfoLog:         infoLog,
+		ErrorLog:        errorLog,
+		RtscStream:      rtscStream,
+		SppStream:       sppStream,
+		WapiStream:      wapiStream,
+		Db:              database,
+		Mtx:             sync.RWMutex{},
 	}
 	AppReceiver(&app)
 	app.startServcies()

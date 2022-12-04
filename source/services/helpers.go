@@ -47,7 +47,7 @@ func zincAuth(username, password string) string {
 const (
 	ErcotRTSC              = "https://www.ercot.com/content/cdr/html/real_time_system_conditions.html"
 	ErcotSPP               = "https://www.ercot.com/content/cdr/html/real_time_spp.html"
-	WeatherUri             = "http://api.weatherapi.com/v1/current.json?key=8c91f83b26994b7b9b8175435222411&q=%v"
+	WeatherUri             = "http://api.weatherapi.com/v1/current.json?key=&q=%v"
 	ZincUri                = "http://127.0.0.1:4080/api/_bulkv2"
 	CurrentFrequency       = 0
 	InstantaneousTimeError = 1
