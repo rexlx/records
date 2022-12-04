@@ -75,12 +75,18 @@ func main() {
 	}
 	AppReceiver(&app)
 	app.startServcies()
+	// this block just keeps the program alive for now
 	for {
 		serviceList := app.getAllServiceData()
 		if len(serviceList) > 0 {
 			app.InfoLog.Println("performing service health check")
 			for k, v := range app.ServiceRegistry {
-				app.InfoLog.Printf("%v (%v) is running. store is: %v", k, v, len(app.Db[v].Records))
+				if _, ok := app.Db[v]; ok {
+					app.InfoLog.Printf("%v (%v) is running. store is: %v", k, v, len(app.Db[v].Records))
+				} else {
+					app.InfoLog.Printf("no longer tracking service: %v", k)
+					delete(app.ServiceRegistry, k)
+				}
 			}
 			time.Sleep(1800 * time.Second)
 		} else {

@@ -11,10 +11,11 @@ import (
 	"github.com/rexlx/records/source/services"
 )
 
-func (app *Application) registerService(uid string, store Store) {
+func (app *Application) registerService(name, uid string, store Store) {
 	app.Mtx.Lock()
 	defer app.Mtx.Unlock()
 	app.Db[uid] = &store
+	app.ServiceRegistry[SanitizeServiceName(name)] = uid
 }
 
 func (app *Application) removeService(uid string) {
