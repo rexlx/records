@@ -77,11 +77,16 @@ func main() {
 	app.startServcies()
 	for {
 		serviceList := app.getServices()
-		if len(serviceList) < 1 {
-			app.InfoLog.Println("no remaining services are scheduled. waiting")
-			// os.Exit(0)
+		if len(serviceList) > 0 {
+			app.InfoLog.Println("performing service health check")
+			for k, v := range app.ServiceRegistry {
+				app.InfoLog.Printf("%v (%v) is running", k, v)
+			}
+			time.Sleep(1800 * time.Second)
+		} else {
+			time.Sleep(4 * time.Second)
+
 		}
-		time.Sleep(60 * time.Second)
 	}
 
 }
