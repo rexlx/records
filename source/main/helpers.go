@@ -33,6 +33,11 @@ func (app *Application) getServices() []Store {
 	return svs
 }
 
+func (app *Application) getServiceById(uid string) *Store {
+	store := app.Db[uid]
+	return store
+}
+
 func serviceValidator(s *ServiceDetails) error {
 	if s.Runtime < 1 || s.Refresh < 1 {
 		return fmt.Errorf("wont start service: %v. runtime or refresh set to zero in config", s.Name)
