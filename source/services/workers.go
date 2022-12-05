@@ -42,7 +42,7 @@ func GetRealTimeSysCon(c chan definitions.ZincRecordV2) {
 		return
 	}
 	result := PowerParser(doc)
-	rpcMessage := SysConResponse{
+	rpcMessage := definitions.SysConResponse{
 		Error:                  false,
 		Freq:                   result[CurrentFrequency].Value,
 		InstantaneousTimeError: result[InstantaneousTimeError].Value,
@@ -75,7 +75,7 @@ func GetRealTimeSysCon(c chan definitions.ZincRecordV2) {
 }
 
 func GetSPP(c chan definitions.ZincRecordV2) {
-	var vals []*Spp
+	var vals []*definitions.Spp
 	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodGet, ErcotSPP, nil)
 	if err != nil {
@@ -106,7 +106,7 @@ func GetSPP(c chan definitions.ZincRecordV2) {
 	values := SppParser(doc)
 
 	for _, item := range values {
-		df := &Spp{
+		df := &definitions.Spp{
 			Date:      fmt.Sprintf("%v %v", item[0], item[1]),
 			HbBusAvg:  toFloat32(item[2]),
 			HbHouston: toFloat32(item[3]),
@@ -128,6 +128,9 @@ func GetSPP(c chan definitions.ZincRecordV2) {
 	}
 	var envelope []map[string]interface{}
 	var tmp map[string]interface{}
+	if len(vals) < 1 {
+		return
+	}
 	out, err := json.Marshal(vals[len(vals)-1])
 	if err != nil {
 		log.Println(err)

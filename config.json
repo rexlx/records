@@ -1,5 +1,5 @@
 {
-    "logpath": "/Users/rxlx/grpc.log",
+    "logpath": "records.log",
     "zinc_uri": "http://127.0.0.1:4080/api/_bulkv2",
     "services": {
         "rtsc_monitor": {
