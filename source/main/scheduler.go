@@ -34,7 +34,8 @@ func AppReceiver(a *Application) {
 	app = a
 }
 
-func (s *ServiceDetails) Run(c chan definitions.ZincRecordV2, wkr func(c chan definitions.ZincRecordV2)) {
+func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
+	newStream := make(chan definitions.ZincRecordV2)
 	if err := serviceValidator(s); err != nil {
 		s.ErrorLog.Println(err)
 		return
@@ -52,8 +53,8 @@ func (s *ServiceDetails) Run(c chan definitions.ZincRecordV2, wkr func(c chan de
 		for {
 			s.InfoLog.Printf("%v is starting. running for %vs every %vs", s.Name, s.Runtime, s.Refresh)
 			for i := 0; i < (s.Runtime / s.Refresh); i++ {
-				go wkr(c)
-				msg := <-c
+				go wkr(newStream)
+				msg := <-newStream
 				s.Store.Records = append(s.Store.Records, &msg)
 				go app.handleStore(s.ServiceId, s.Store)
 				time.Sleep(time.Duration(s.Refresh) * time.Second)
@@ -76,8 +77,8 @@ func (s *ServiceDetails) Run(c chan definitions.ZincRecordV2, wkr func(c chan de
 			} else {
 				s.InfoLog.Printf("%v is starting. running for %vs every %vs", s.Name, s.Runtime, s.Refresh)
 				for i := 0; i < (s.Runtime / s.Refresh); i++ {
-					go wkr(c)
-					msg := <-c
+					go wkr(newStream)
+					msg := <-newStream
 					s.Store.Records = append(s.Store.Records, &msg)
 					go app.handleStore(s.ServiceId, s.Store)
 					time.Sleep(time.Duration(s.Refresh) * time.Second)

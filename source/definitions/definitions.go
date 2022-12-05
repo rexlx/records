@@ -42,3 +42,45 @@ type Location struct {
 	Longitude float64 `json:"lon"`
 	LocalTime string  `json:"localtime"`
 }
+
+type Spp struct {
+	Date string
+	HbBusAvg,
+	HbHouston,
+	HbHubAvg,
+	HbNorth,
+	HbPan,
+	HbSouth,
+	HbWest,
+	LzAen,
+	LzCps,
+	LzHouston,
+	LzLcra,
+	LzNorth,
+	LzRaybn,
+	LzSouth,
+	LzWest float32
+}
+type SysConResponse struct {
+	Error                  bool    `json:"error,omitempty"`
+	Info                   string  `json:"info"`
+	Freq                   float32 `json:"freq,omitempty"`
+	InstantaneousTimeError float32 `json:"instantaneous_time_error"`
+	BAALExceedances        float32 `json:"baal_exceedances"`
+	Demand                 float32 `json:"demand,omitempty"`
+	Cap                    float32 `json:"cap,omitempty"`
+	WindOutput             float32 `json:"wind_output,omitempty"`
+	PVGR                   float32 `json:"pvgr"`
+	Inertia                float32 `json:"inertia,omitempty"`
+	DC_E                   float32 `json:"dc_e"`
+	DC_L                   float32 `json:"dc_l"`
+	DC_N                   float32 `json:"dc_n"`
+	DC_R                   float32 `json:"dc_r"`
+	DC_S                   float32 `json:"dc_s"`
+}
+
+type RawValueStore struct {
+	Spp  []*Spp
+	Rtsc []*SysConResponse
+	Wapi []*WeatherResponse
+}
