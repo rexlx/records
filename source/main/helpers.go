@@ -16,12 +16,19 @@ func (app *Application) registerService(name, uid string, store Store) {
 	defer app.Mtx.Unlock()
 	app.Db[uid] = &store
 	app.ServiceRegistry[SanitizeServiceName(name)] = uid
+	app.InfoLog.Printf("service registered: %v\t(%v)", uid, name)
 }
 
 func (app *Application) removeService(uid string) {
 	app.Mtx.Lock()
 	defer app.Mtx.Unlock()
 	delete(app.Db, uid)
+	for k, v := range app.ServiceRegistry {
+		if uid == v {
+			delete(app.ServiceRegistry, k)
+		}
+	}
+	app.InfoLog.Printf("service removed: %v", uid)
 }
 
 func (app *Application) getAllServiceData() []Store {
@@ -34,8 +41,11 @@ func (app *Application) getAllServiceData() []Store {
 	return svs
 }
 
-func (app *Application) getServiceDataById(uid string) *Store {
-	return app.Db[uid]
+func (app *Application) getServiceDataById(uid string) (*Store, error) {
+	if _, ok := app.Db[uid]; ok {
+		return app.Db[uid], nil
+	}
+	return &Store{}, fmt.Errorf("no data store linked to that id")
 }
 
 func serviceValidator(s *ServiceDetails) error {

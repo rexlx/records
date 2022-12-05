@@ -84,13 +84,13 @@ func main() {
 				if _, ok := app.Db[v]; ok {
 					app.InfoLog.Printf("%v (%v) is running. store is: %v", k, v, len(app.Db[v].Records))
 				} else {
-					app.InfoLog.Printf("no longer tracking service: %v", k)
+					app.InfoLog.Printf("this service should be dead.. %v", k)
 					delete(app.ServiceRegistry, k)
 				}
 			}
 			time.Sleep(1800 * time.Second)
 		} else {
-			time.Sleep(4 * time.Second)
+			time.Sleep(1 * time.Second)
 
 		}
 	}
@@ -118,6 +118,4 @@ func (app *Application) startServcies() {
 	app.Config.Services.WM.Stream = app.WapiStream
 	app.Config.Services.WM.Store = &Store{}
 	go app.Config.Services.WM.Run(app.WapiStream, services.GetWeather)
-
-	app.InfoLog.Println("finished starting services")
 }
