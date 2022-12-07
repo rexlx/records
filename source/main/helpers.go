@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -57,20 +58,26 @@ func serviceValidator(s *ServiceDetails) error {
 
 func (app *Application) handleStore(uid string, store *Store) {
 	if len(store.Records) > 0 {
-		services.SaveRecordToZinc(*store.Records[len(store.Records)-1], app.ErrorLog)
+		services.SaveRecordToZinc(app.Config.ZincUri, *store.Records[len(store.Records)-1], app.ErrorLog)
 		if len(store.Records) > 99 {
 			var emptyStore []*definitions.ZincRecordV2
-			app.saveStore(store)
+			app.saveStore("", store)
 			store.Records = emptyStore
 		}
 	}
-
+	// this needs a sync rw mutex i bet
 	app.Db[uid] = store
 }
 
-func (app *Application) saveStore(store *Store) {
+func (app *Application) saveStore(uid string, store *Store) {
 	now := time.Now().Format("2006-01-02_1504")
-	file, err := os.OpenFile(fmt.Sprintf("/home/link/data_%v.json", now), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	err := app.handleServiceStorageDir(uid)
+	if err != nil {
+		app.ErrorLog.Println(err)
+	}
+	outfile := fmt.Sprintf("%v/%v/data_%v.json", app.Config.DataDir, uid, now)
+
+	file, err := os.OpenFile(outfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		app.ErrorLog.Println("couldnt save the store", err)
 		return
@@ -82,4 +89,13 @@ func (app *Application) saveStore(store *Store) {
 
 func SanitizeServiceName(name string) string {
 	return strings.ReplaceAll(name, " ", "_")
+}
+
+func (app *Application) handleServiceStorageDir(uid string) error {
+	dasPath := filepath.Join(app.Config.DataDir, uid)
+	err := os.MkdirAll(dasPath, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	return nil
 }

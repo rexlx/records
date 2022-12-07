@@ -22,6 +22,7 @@ type Application struct {
 type RuntimeConfig struct {
 	ZincUri  string `json:"zinc_uri"`
 	LogPath  string `json:"logpath"`
+	DataDir  string `json:"data_dir"`
 	Services struct {
 		RTSC ServiceDetails `json:"rtsc_monitor"`
 		SPP  ServiceDetails `json:"spp_monitor"`

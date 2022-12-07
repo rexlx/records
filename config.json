@@ -1,6 +1,7 @@
 {
     "logpath": "records.log",
     "zinc_uri": "http://127.0.0.1:4080/api/_bulkv2",
+    "data_dir": "/home/rxlx/bin/data",
     "services": {
         "rtsc_monitor": {
             "name": "real time system conditions monitor",
