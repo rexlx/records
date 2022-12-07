@@ -126,9 +126,6 @@ func SppParser(doc *html.Node) [][]string {
 func parseSppVals(slice []string, step int) [][]string {
 	// var s *Spp
 	var table [][]string
-	if len(slice) < 1 {
-		return table
-	}
 	for i := 0; i < len(slice); i += step {
 		end := i + step
 		if end > len(slice) {

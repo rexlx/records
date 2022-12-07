@@ -129,6 +129,10 @@ func GetSPP(c chan definitions.ZincRecordV2) {
 	var envelope []map[string]interface{}
 	var tmp map[string]interface{}
 	if len(vals) < 1 {
+		c <- definitions.ZincRecordV2{
+			Index:   "EmptyData",
+			Records: envelope,
+		}
 		return
 	}
 	out, err := json.Marshal(vals[len(vals)-1])
