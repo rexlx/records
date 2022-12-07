@@ -61,7 +61,7 @@ func (app *Application) handleStore(uid string, store *Store) {
 		services.SaveRecordToZinc(app.Config.ZincUri, *store.Records[len(store.Records)-1], app.ErrorLog)
 		if len(store.Records) > 99 {
 			var emptyStore []*definitions.ZincRecordV2
-			app.saveStore("", store)
+			app.saveStore(uid, store)
 			store.Records = emptyStore
 		}
 	}
