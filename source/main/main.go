@@ -33,9 +33,9 @@ type RuntimeConfig struct {
 func main() {
 	var config RuntimeConfig
 
-	contents, err := os.ReadFile(os.Getenv("CFG"))
+	contents, err := os.ReadFile(os.Getenv("RECORDS_CONFIG"))
 	if err != nil {
-		log.Println("did you set your CFG environment variable?")
+		log.Println("did you set your RECORDS_CONFIG environment variable?")
 		log.Fatalln(err)
 	}
 

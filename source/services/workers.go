@@ -42,7 +42,7 @@ func GetRealTimeSysCon(c chan definitions.ZincRecordV2) {
 		return
 	}
 	result := PowerParser(doc)
-	rpcMessage := definitions.SysConResponse{
+	rtsc_res := definitions.SysConResponse{
 		Error:                  false,
 		Freq:                   result[CurrentFrequency].Value,
 		InstantaneousTimeError: result[InstantaneousTimeError].Value,
@@ -60,7 +60,7 @@ func GetRealTimeSysCon(c chan definitions.ZincRecordV2) {
 	}
 	var envelope []map[string]interface{}
 	var tmp map[string]interface{}
-	out, err := json.Marshal(rpcMessage)
+	out, err := json.Marshal(rtsc_res)
 	if err != nil {
 		log.Println(err)
 		return

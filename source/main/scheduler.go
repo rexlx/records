@@ -29,7 +29,7 @@ type ServiceDetails struct {
 	Store     *Store
 }
 
-// Appreceiver is how the rpcs gain access to app wide data
+// Appreceiver is how the scheduler gets access to app wide data
 func AppReceiver(a *Application) {
 	app = a
 }
