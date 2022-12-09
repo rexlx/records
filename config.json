@@ -1,13 +1,14 @@
 {
     "logpath": "records.log",
     "zinc_uri": "http://127.0.0.1:4080/api/_bulkv2",
+    "data_dir": "/Users/rxlx/bin/data",
     "services": {
         "rtsc_monitor": {
             "name": "real time system conditions monitor",
             "index": "ercotsRTSC",
             "runtime": 28800,
             "refresh": 300,
-            "scheduled": true,
+            "scheduled": false,
             "start_at": ["16:20", "America/Chicago"],
             "rerun": true
         },

@@ -22,6 +22,7 @@ type Application struct {
 type RuntimeConfig struct {
 	ZincUri  string `json:"zinc_uri"`
 	LogPath  string `json:"logpath"`
+	DataDir  string `json:"data_dir"`
 	Services struct {
 		RTSC ServiceDetails `json:"rtsc_monitor"`
 		SPP  ServiceDetails `json:"spp_monitor"`
@@ -32,9 +33,9 @@ type RuntimeConfig struct {
 func main() {
 	var config RuntimeConfig
 
-	contents, err := os.ReadFile(os.Getenv("CFG"))
+	contents, err := os.ReadFile(os.Getenv("RECORDS_CONFIG"))
 	if err != nil {
-		log.Println("did you set your CFG environment variable?")
+		log.Println("did you set your RECORDS_CONFIG environment variable?")
 		log.Fatalln(err)
 	}
 
