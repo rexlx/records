@@ -4,16 +4,19 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/rexlx/records/source/definitions"
 	"golang.org/x/net/html"
 )
 
 func SaveRecordToZinc(zuri string, record definitions.ZincRecordV2, logger *log.Logger) {
+	record.Index = fmt.Sprintf("%v-%v", time.Now().Format("200601"), record.Index)
 	out, err := json.Marshal(record)
 	if err != nil {
 		logger.Println(err)
