@@ -106,4 +106,10 @@ func (app *Application) startServcies() {
 	app.Config.Services.WM.ErrorLog = app.ErrorLog
 	app.Config.Services.WM.Store = &Store{}
 	go app.Config.Services.WM.Run(services.GetWeather)
+
+	// cpu mon
+	app.Config.Services.WM.InfoLog = app.InfoLog
+	app.Config.Services.WM.ErrorLog = app.ErrorLog
+	app.Config.Services.WM.Store = &Store{}
+	go app.Config.Services.WM.Run(services.CpuMon)
 }

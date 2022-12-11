@@ -205,3 +205,22 @@ func GetWeather(c chan definitions.ZincRecordV2) {
 		Records: envelope,
 	}
 }
+
+func CpuMon(c chan definitions.ZincRecordV2) {
+	vals := GetCpuValues(2)
+	var envelope []map[string]interface{}
+	for _, i := range vals {
+		var tmp map[string]interface{}
+		out, err := json.Marshal(i)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		json.Unmarshal(out, &tmp)
+		envelope = append(envelope, tmp)
+	}
+	c <- definitions.ZincRecordV2{
+		Index:   "cpuMonRxlx",
+		Records: envelope,
+	}
+}

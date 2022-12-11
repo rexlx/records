@@ -29,6 +29,15 @@
             "scheduled": false,
             "start_at": ["13:42", "America/Chicago"],
             "rerun": true
+        },
+        "cpu_monitor": {
+            "name": "rxlx cpu mon",
+            "index": "cpuMonRxlx",
+            "runtime": 86400,
+            "refresh": 28,
+            "scheduled": false,
+            "start_at": ["16:20", "America/Chicago"],
+            "rerun": true
         }
     }
 }
