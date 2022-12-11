@@ -188,6 +188,7 @@ func GetCpuValues(refresh int) []*CpuValue {
 			Usage: 100 * (float64(total) - float64(idle)) / float64(total),
 			Time:  now})
 	}
+	log.Println(values)
 	return values
 }
 

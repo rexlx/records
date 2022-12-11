@@ -24,9 +24,10 @@ type RuntimeConfig struct {
 	LogPath  string `json:"logpath"`
 	DataDir  string `json:"data_dir"`
 	Services struct {
-		RTSC ServiceDetails `json:"rtsc_monitor"`
-		SPP  ServiceDetails `json:"spp_monitor"`
-		WM   ServiceDetails `json:"wapi_monitor"`
+		RTSC   ServiceDetails `json:"rtsc_monitor"`
+		SPP    ServiceDetails `json:"spp_monitor"`
+		WM     ServiceDetails `json:"wapi_monitor"`
+		CPUMON ServiceDetails `json:"cpu_monitor"`
 	} `json:"services"`
 }
 
@@ -108,8 +109,8 @@ func (app *Application) startServcies() {
 	go app.Config.Services.WM.Run(services.GetWeather)
 
 	// cpu mon
-	app.Config.Services.WM.InfoLog = app.InfoLog
-	app.Config.Services.WM.ErrorLog = app.ErrorLog
-	app.Config.Services.WM.Store = &Store{}
-	go app.Config.Services.WM.Run(services.CpuMon)
+	app.Config.Services.CPUMON.InfoLog = app.InfoLog
+	app.Config.Services.CPUMON.ErrorLog = app.ErrorLog
+	app.Config.Services.CPUMON.Store = &Store{}
+	go app.Config.Services.CPUMON.Run(services.CpuMon)
 }
