@@ -219,6 +219,7 @@ func CpuMon(c chan definitions.ZincRecordV2) {
 		json.Unmarshal(out, &tmp)
 		envelope = append(envelope, tmp)
 	}
+	log.Println(envelope)
 	c <- definitions.ZincRecordV2{
 		Index:   "cpuMonRxlx",
 		Records: envelope,
