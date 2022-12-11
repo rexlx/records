@@ -52,7 +52,7 @@ func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 	if !s.Scheduled {
 		for {
 			s.InfoLog.Printf("%v is starting. running for %vs every %vs", s.Name, s.Runtime, s.Refresh)
-			for start := time.Now(); time.Since(start) < time.Duration(s.Runtime); {
+			for start := time.Now(); time.Since(start) < time.Second*time.Duration(s.Runtime); {
 				go wkr(newStream)
 				msg := <-newStream
 				s.Store.Records = append(s.Store.Records, &msg)
@@ -76,7 +76,7 @@ func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 				time.Sleep(1 * time.Second)
 			} else {
 				s.InfoLog.Printf("%v is starting. running for %vs every %vs", s.Name, s.Runtime, s.Refresh)
-				for start := time.Now(); time.Since(start) < time.Duration(s.Runtime); {
+				for start := time.Now(); time.Since(start) < time.Second*time.Duration(s.Runtime); {
 					go wkr(newStream)
 					msg := <-newStream
 					s.Store.Records = append(s.Store.Records, &msg)
