@@ -163,7 +163,7 @@ type CpuValue struct {
 
 // GetCpuValues reads the proc stat file, waits for the refresh
 // interval and returns the list of values
-func GetCpuValues(refresh int) []*CpuValue {
+func GetCpuValues(c chan []*CpuValue, refresh int) {
 	now := time.Now()
 	values := []*CpuValue{}
 	initialPoll, err := pollCpu()
@@ -188,7 +188,7 @@ func GetCpuValues(refresh int) []*CpuValue {
 			Usage: 100 * (float64(total) - float64(idle)) / float64(total),
 			Time:  now})
 	}
-	return values
+	c <- values
 }
 
 // pollCpu reads the /proc/stat file and calculates cpu utilization percentage.

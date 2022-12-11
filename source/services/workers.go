@@ -207,7 +207,9 @@ func GetWeather(c chan definitions.ZincRecordV2) {
 }
 
 func CpuMon(c chan definitions.ZincRecordV2) {
-	vals := GetCpuValues(2)
+	cc := make(chan []*CpuValue)
+	go GetCpuValues(cc, 2)
+	vals := <-cc
 	var envelope []map[string]interface{}
 	for _, i := range vals {
 		var tmp map[string]interface{}
@@ -219,7 +221,6 @@ func CpuMon(c chan definitions.ZincRecordV2) {
 		json.Unmarshal(out, &tmp)
 		envelope = append(envelope, tmp)
 	}
-	log.Println(envelope)
 	c <- definitions.ZincRecordV2{
 		Index:   "cpuMonRxlx",
 		Records: envelope,
