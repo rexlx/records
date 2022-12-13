@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/rexlx/performance"
 	"github.com/rexlx/records/source/definitions"
 	"golang.org/x/net/html"
 )
@@ -207,9 +208,11 @@ func GetWeather(c chan definitions.ZincRecordV2) {
 }
 
 func CpuMon(c chan definitions.ZincRecordV2) {
-	vals := GetCpuValues(2)
+	stream := make(chan []*performance.CpuUsage)
+	go performance.GetCpuValues(stream, 2)
+	msg := <-stream
 	var envelope []map[string]interface{}
-	for _, i := range vals {
+	for _, i := range msg {
 		var tmp map[string]interface{}
 		out, err := json.Marshal(i)
 		if err != nil {
