@@ -1,10 +1,13 @@
 package main
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -13,6 +16,7 @@ import (
 
 	"github.com/rexlx/records/source/definitions"
 	"github.com/rexlx/records/source/services"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (app *Application) registerService(name, uid string, state *ServiceDetails) {
@@ -159,4 +163,49 @@ func (app *Application) readJSON(w http.ResponseWriter, r *http.Request, data in
 		return errors.New("error parsing json")
 	}
 	return nil
+}
+
+func (app *Application) createApiKey() {
+	val, err := genRandomString()
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+	key, err := bcrypt.GenerateFromPassword([]byte(val), 12)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+	app.ServiceRegistry["this_api"] = string(key)
+}
+func (app *Application) validateKey(r *http.Request) (bool, error) {
+	header := r.Header.Get("Authorization")
+	if header == "" {
+		return false, errors.New("no auth headers")
+	}
+
+	values := strings.Split(header, " ")
+	if len(values) != 2 || values[0] != "Bearer" {
+		return false, errors.New("bad auth headers")
+	}
+	log.Println(values[1])
+	err := bcrypt.CompareHashAndPassword([]byte(app.ServiceRegistry["this_api"]), []byte(values[1]))
+	if err != nil {
+		switch {
+		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
+			// invalid password
+			return false, nil
+		default:
+			return false, err
+		}
+	}
+	return true, nil
+}
+
+func genRandomString() (string, error) {
+	bytes := make([]byte, 32)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
 }
