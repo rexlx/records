@@ -1,6 +1,6 @@
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/rexlx/performance v0.0.0-20221213013906-e2c90faba1b4 h1:/OnQTNs4YkN3SwHTlX/rVzU6cktTAJ6TsvZpanbOIjs=
-github.com/rexlx/performance v0.0.0-20221213013906-e2c90faba1b4/go.mod h1:n7IFU0j3xhDzXba2ZzzKnifwBlEuMAg3yP247DIKTdM=
+github.com/rexlx/performance v0.0.0-20221213015831-868d89639eb4 h1:wPsFtka5DIFUK5vGYoIoOEAMwtn0QnmTNLW5Ii4FXfc=
+github.com/rexlx/performance v0.0.0-20221213015831-868d89639eb4/go.mod h1:n7IFU0j3xhDzXba2ZzzKnifwBlEuMAg3yP247DIKTdM=
 golang.org/x/net v0.2.0 h1:sZfSu1wtKLGlWI4ZZayP0ck9Y73K1ynO6gqzTdBVdPU=
 golang.org/x/net v0.2.0/go.mod h1:KqCZLdyyvdV855qA2rE3GC2aiw5xGR5TEjj8smXukLY=

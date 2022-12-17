@@ -27,6 +27,7 @@ type RuntimeConfig struct {
 		RTSC ServiceDetails `json:"rtsc_monitor"`
 		SPP  ServiceDetails `json:"spp_monitor"`
 		WM   ServiceDetails `json:"wapi_monitor"`
+		RCPU ServiceDetails `json:"cpu_monitor"`
 	} `json:"services"`
 }
 
@@ -93,23 +94,27 @@ func (app *Application) startServcies() {
 	app.Config.Services.RTSC.InfoLog = app.InfoLog
 	app.Config.Services.RTSC.ErrorLog = app.ErrorLog
 	app.Config.Services.RTSC.Store = &Store{}
+	app.Config.Services.RTSC.Kill = make(chan interface{})
 	go app.Config.Services.RTSC.Run(services.GetRealTimeSysCon)
 
 	// set up settlment point price monitor
 	app.Config.Services.SPP.InfoLog = app.InfoLog
 	app.Config.Services.SPP.ErrorLog = app.ErrorLog
 	app.Config.Services.SPP.Store = &Store{}
+	app.Config.Services.SPP.Kill = make(chan interface{})
 	go app.Config.Services.SPP.Run(services.GetSPP)
 
 	// set up weather monitor
 	app.Config.Services.WM.InfoLog = app.InfoLog
 	app.Config.Services.WM.ErrorLog = app.ErrorLog
 	app.Config.Services.WM.Store = &Store{}
+	app.Config.Services.WM.Kill = make(chan interface{})
 	go app.Config.Services.WM.Run(services.GetWeather)
 
 	// cpu mon
-	app.Config.Services.WM.InfoLog = app.InfoLog
-	app.Config.Services.WM.ErrorLog = app.ErrorLog
-	app.Config.Services.WM.Store = &Store{}
-	go app.Config.Services.WM.Run(services.CpuMon)
+	app.Config.Services.RCPU.InfoLog = app.InfoLog
+	app.Config.Services.RCPU.ErrorLog = app.ErrorLog
+	app.Config.Services.RCPU.Store = &Store{}
+	app.Config.Services.RCPU.Kill = make(chan interface{})
+	go app.Config.Services.RCPU.Run(services.CpuMon)
 }

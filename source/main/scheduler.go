@@ -23,6 +23,7 @@ type ServiceDetails struct {
 	Scheduled bool     `json:"scheduled"`
 	StartAt   []string `json:"start_at"`
 	ServiceId string
+	Kill      chan interface{}
 	Stream    chan definitions.ZincRecordV2
 	InfoLog   *log.Logger
 	ErrorLog  *log.Logger
@@ -50,9 +51,15 @@ func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 
 	// starts immediately
 	if !s.Scheduled {
+	runtime:
 		for {
 			s.InfoLog.Printf("%v is starting. running for %vs every %vs", s.Name, s.Runtime, s.Refresh)
 			for start := time.Now(); time.Since(start) < time.Second*time.Duration(s.Runtime); {
+				select {
+				case <-s.Kill:
+					break runtime
+				default:
+				}
 				go wkr(newStream)
 				msg := <-newStream
 				s.Store.Records = append(s.Store.Records, &msg)
@@ -70,6 +77,7 @@ func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 
 	if s.Scheduled {
 		s.InfoLog.Printf("%v initialized. waiting for work to start at %v", s.Name, s.StartAt)
+	schedule:
 		for {
 			// this branch waits for scheduled time to occur
 			if time.Now().In(tz).Format("15:04") != t {
@@ -77,6 +85,11 @@ func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 			} else {
 				s.InfoLog.Printf("%v is starting. running for %vs every %vs", s.Name, s.Runtime, s.Refresh)
 				for start := time.Now(); time.Since(start) < time.Second*time.Duration(s.Runtime); {
+					select {
+					case <-s.Kill:
+						break schedule
+					default:
+					}
 					go wkr(newStream)
 					msg := <-newStream
 					s.Store.Records = append(s.Store.Records, &msg)
@@ -85,12 +98,14 @@ func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 				}
 				if !s.ReRun {
 					s.InfoLog.Println("terminating", s.Name)
-					app.removeService(uid)
+					app.removeService(s.ServiceId)
 					return
 				}
 				s.InfoLog.Println(s.Name, "rotating service")
 			}
 		}
 	}
+	s.InfoLog.Printf("exit condition for %v (%v) reached.", s.Name, s.ServiceId)
+	app.removeService(s.ServiceId)
 
 }
