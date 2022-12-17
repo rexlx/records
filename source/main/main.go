@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"sync"
 	"time"
@@ -23,6 +25,7 @@ type RuntimeConfig struct {
 	ZincUri  string `json:"zinc_uri"`
 	LogPath  string `json:"logpath"`
 	DataDir  string `json:"data_dir"`
+	Port     int    `json:"api_port"`
 	Services struct {
 		RTSC ServiceDetails `json:"rtsc_monitor"`
 		SPP  ServiceDetails `json:"spp_monitor"`
@@ -67,6 +70,7 @@ func main() {
 	}
 	AppReceiver(&app)
 	app.startServcies()
+	app.startApi()
 	// this block just keeps the program alive for now
 	for {
 		serviceList := app.getAllServiceData()
@@ -87,6 +91,15 @@ func main() {
 		}
 	}
 
+}
+
+func (app *Application) startApi() error {
+	app.InfoLog.Printf("starting api on port %v", 0)
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", app.Config.Port),
+		Handler: app.apiRoutes(),
+	}
+	return srv.ListenAndServe()
 }
 
 func (app *Application) startServcies() {
