@@ -102,6 +102,7 @@ func (app *Application) startApi() error {
 		Addr:    fmt.Sprintf(":%d", app.Config.Port),
 		Handler: app.apiRoutes(),
 	}
+	app.createApiKey()
 	return srv.ListenAndServe()
 }
 

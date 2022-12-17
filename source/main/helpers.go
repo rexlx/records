@@ -177,7 +177,9 @@ func (app *Application) createApiKey() {
 		return
 	}
 	app.ServiceRegistry["this_api"] = string(key)
+	app.InfoLog.Println("first time admin key:", val)
 }
+
 func (app *Application) validateKey(r *http.Request) (bool, error) {
 	header := r.Header.Get("Authorization")
 	if header == "" {
@@ -203,7 +205,7 @@ func (app *Application) validateKey(r *http.Request) (bool, error) {
 }
 
 func genRandomString() (string, error) {
-	bytes := make([]byte, 32)
+	bytes := make([]byte, 20)
 	if _, err := rand.Read(bytes); err != nil {
 		return "", err
 	}
