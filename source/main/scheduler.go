@@ -43,7 +43,7 @@ func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 	}
 
 	uid := uuid.Must(uuid.NewRandom()).String()
-	app.registerService(s.Name, uid, *s.Store)
+	app.registerService(s.Name, uid, s)
 
 	s.ServiceId = uid
 	t, z := s.StartAt[0], s.StartAt[1]

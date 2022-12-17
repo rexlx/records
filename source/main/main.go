@@ -18,6 +18,7 @@ type Application struct {
 	Config          *RuntimeConfig
 	ServiceRegistry map[string]string
 	Db              map[string]*Store
+	StateMap        map[string]*ServiceDetails
 	Mtx             sync.RWMutex
 }
 
@@ -57,6 +58,7 @@ func main() {
 
 	infoLog := log.New(file, "info  ", log.Ldate|log.Ltime)
 	errorLog := log.New(file, "error ", log.Ldate|log.Ltime)
+	state := make(map[string]*ServiceDetails)
 	database := make(map[string]*Store)
 	serviceRegistry := make(map[string]string)
 
@@ -66,6 +68,7 @@ func main() {
 		InfoLog:         infoLog,
 		ErrorLog:        errorLog,
 		Db:              database,
+		StateMap:        state,
 		Mtx:             sync.RWMutex{},
 	}
 	AppReceiver(&app)
@@ -94,7 +97,7 @@ func main() {
 }
 
 func (app *Application) startApi() error {
-	app.InfoLog.Printf("starting api on port %v", 0)
+	app.InfoLog.Printf("starting api on port %v", app.Config.Port)
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", app.Config.Port),
 		Handler: app.apiRoutes(),

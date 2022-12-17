@@ -15,11 +15,12 @@ import (
 	"github.com/rexlx/records/source/services"
 )
 
-func (app *Application) registerService(name, uid string, store Store) {
+func (app *Application) registerService(name, uid string, state *ServiceDetails) {
 	app.Mtx.Lock()
 	defer app.Mtx.Unlock()
-	app.Db[uid] = &store
+	app.Db[uid] = state.Store
 	app.ServiceRegistry[SanitizeServiceName(name)] = uid
+	app.StateMap[uid] = state
 	app.InfoLog.Printf("service registered: %v\t(%v)", uid, name)
 }
 

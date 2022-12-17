@@ -13,7 +13,8 @@ func (app *Application) apiRoutes() http.Handler {
 
 	mux.Route("/app", func(mux chi.Router) {
 		// here we can use middleware for anything in the `app` route
-		mux.Post("/runtime", app.ListServices)
+		mux.Get("/runtime", app.ListServices)
+		mux.Post("/kill", app.KillService)
 	})
 	// static files
 	fserver := http.FileServer(http.Dir("./static/"))
