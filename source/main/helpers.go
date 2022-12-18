@@ -17,10 +17,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (app *Application) registerService(name, uid string, state *ServiceDetails) {
+// registerService adds a service to the application state map
+func (app *Application) registerService(uid string, state *ServiceDetails) {
 	app.Mtx.Lock()
 	defer app.Mtx.Unlock()
-	app.ServiceRegistry[SanitizeServiceName(name)] = uid
+	app.ServiceRegistry[SanitizeServiceName(state.Name)] = uid
 	app.StateMap[uid] = state
 }
 
