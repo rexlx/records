@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -186,7 +185,6 @@ func (app *Application) validateKey(r *http.Request) (bool, error) {
 	if len(values) != 2 || values[0] != "Bearer" {
 		return false, errors.New("bad auth headers")
 	}
-	log.Println(values[1])
 	err := bcrypt.CompareHashAndPassword([]byte(app.ApiKey), []byte(values[1]))
 	if err != nil {
 		switch {
