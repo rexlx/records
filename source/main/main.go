@@ -16,8 +16,8 @@ type Application struct {
 	InfoLog         *log.Logger
 	ErrorLog        *log.Logger
 	Config          *RuntimeConfig
+	ApiKey          string
 	ServiceRegistry map[string]string
-	Db              map[string]*Store
 	StateMap        map[string]*ServiceDetails
 	Mtx             sync.RWMutex
 }
@@ -59,7 +59,6 @@ func main() {
 	infoLog := log.New(file, "info  ", log.Ldate|log.Ltime)
 	errorLog := log.New(file, "error ", log.Ldate|log.Ltime)
 	state := make(map[string]*ServiceDetails)
-	database := make(map[string]*Store)
 	serviceRegistry := make(map[string]string)
 
 	app := Application{
@@ -67,7 +66,6 @@ func main() {
 		ServiceRegistry: serviceRegistry,
 		InfoLog:         infoLog,
 		ErrorLog:        errorLog,
-		Db:              database,
 		StateMap:        state,
 		Mtx:             sync.RWMutex{},
 	}
@@ -80,8 +78,8 @@ func main() {
 		if len(serviceList) > 0 {
 			app.InfoLog.Println("performing service health check")
 			for k, v := range app.ServiceRegistry {
-				if _, ok := app.Db[v]; ok {
-					app.InfoLog.Printf("%v (%v) is running. store is: %v", k, v, len(app.Db[v].Records))
+				if _, ok := app.StateMap[v]; ok {
+					app.InfoLog.Printf("%v (%v) is running", k, v)
 				} else {
 					app.InfoLog.Printf("this service should be dead.. %v", k)
 					delete(app.ServiceRegistry, k)

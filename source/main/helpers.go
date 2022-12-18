@@ -22,37 +22,34 @@ import (
 func (app *Application) registerService(name, uid string, state *ServiceDetails) {
 	app.Mtx.Lock()
 	defer app.Mtx.Unlock()
-	app.Db[uid] = state.Store
 	app.ServiceRegistry[SanitizeServiceName(name)] = uid
 	app.StateMap[uid] = state
-	app.InfoLog.Printf("service registered: %v\t(%v)", uid, name)
 }
 
 func (app *Application) removeService(uid string) {
 	app.Mtx.Lock()
 	defer app.Mtx.Unlock()
-	delete(app.Db, uid)
+	delete(app.StateMap, uid)
 	for k, v := range app.ServiceRegistry {
 		if uid == v {
 			delete(app.ServiceRegistry, k)
 		}
 	}
-	app.InfoLog.Printf("service removed: %v", uid)
 }
 
-func (app *Application) getAllServiceData() []Store {
-	var svs []Store
+func (app *Application) getAllServiceData() []*ServiceDetails {
+	var svs []*ServiceDetails
 	app.Mtx.RLock()
 	defer app.Mtx.RUnlock()
-	for _, store := range app.Db {
-		svs = append(svs, *store)
+	for _, svc := range app.StateMap {
+		svs = append(svs, svc)
 	}
 	return svs
 }
 
 func (app *Application) getServiceDataById(uid string) (*Store, error) {
-	if _, ok := app.Db[uid]; ok {
-		return app.Db[uid], nil
+	if _, ok := app.StateMap[uid]; ok {
+		return app.StateMap[uid].Store, nil
 	}
 	return &Store{}, fmt.Errorf("no data store linked to that id")
 }
@@ -74,7 +71,7 @@ func (app *Application) handleStore(uid string, store *Store) {
 		}
 	}
 	// this needs a sync rw mutex i bet
-	app.Db[uid] = store
+	app.StateMap[uid].Store = store
 }
 
 func (app *Application) saveStore(uid string, store *Store) {
@@ -176,7 +173,7 @@ func (app *Application) createApiKey() {
 		app.ErrorLog.Println(err)
 		return
 	}
-	app.ServiceRegistry["this_api"] = string(key)
+	app.ApiKey = string(key)
 	app.InfoLog.Println("first time admin key:", val)
 }
 
@@ -191,7 +188,7 @@ func (app *Application) validateKey(r *http.Request) (bool, error) {
 		return false, errors.New("bad auth headers")
 	}
 	log.Println(values[1])
-	err := bcrypt.CompareHashAndPassword([]byte(app.ServiceRegistry["this_api"]), []byte(values[1]))
+	err := bcrypt.CompareHashAndPassword([]byte(app.ApiKey), []byte(values[1]))
 	if err != nil {
 		switch {
 		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
@@ -205,6 +202,7 @@ func (app *Application) validateKey(r *http.Request) (bool, error) {
 }
 
 func genRandomString() (string, error) {
+	// 40 hex chars
 	bytes := make([]byte, 20)
 	if _, err := rand.Read(bytes); err != nil {
 		return "", err
