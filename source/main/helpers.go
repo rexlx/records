@@ -12,7 +12,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/rexlx/records/source/definitions"
 	"github.com/rexlx/records/source/services"
@@ -47,11 +46,11 @@ func (app *Application) getAllServiceData() []*ServiceDetails {
 	return svs
 }
 
-func (app *Application) getServiceDataById(uid string) (*Store, error) {
+func (app *Application) getServiceDataById(uid string) (*ServiceDetails, error) {
 	if _, ok := app.StateMap[uid]; ok {
-		return app.StateMap[uid].Store, nil
+		return app.StateMap[uid], nil
 	}
-	return &Store{}, fmt.Errorf("no data store linked to that id")
+	return &ServiceDetails{}, fmt.Errorf("no data store linked to that id")
 }
 
 func serviceValidator(s *ServiceDetails) error {
@@ -75,12 +74,12 @@ func (app *Application) handleStore(uid string, store *Store) {
 }
 
 func (app *Application) saveStore(uid string, store *Store) {
-	now := time.Now().Format("2006-01-02_1504")
+	// now := time.Now().Format("2006-01-02_1504")
 	err := app.handleServiceStorageDir(uid)
 	if err != nil {
 		app.ErrorLog.Println(err)
 	}
-	outfile := fmt.Sprintf("%v/%v/data_%v.json", app.Config.DataDir, uid, now)
+	outfile := fmt.Sprintf("%v/%v/data.json", app.Config.DataDir, uid)
 
 	file, err := os.OpenFile(outfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
