@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -60,8 +61,12 @@ func (app *Application) getServiceDataById(uid string) (*serviceDetails, error) 
 	return &serviceDetails{}, fmt.Errorf("no data store linked to that id")
 }
 
-func (app *Application) getLoadedServices() []*serviceDetails {
-	return app.Config.Services
+func (app *Application) getLoadedServices() []byte {
+	out, err := json.Marshal(app.Config.Services)
+	if err != nil {
+		log.Println(err)
+	}
+	return out
 }
 
 // handleStore sends the records to be indexed (look into zinclabs). additionally

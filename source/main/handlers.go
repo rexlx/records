@@ -8,12 +8,24 @@ import (
 )
 
 type jsonResponse definitions.JsonResponse
-type box map[string]interface{}
 
+// type box map[string]interface{}
+
+// ListServices lists all running services
 func (app *Application) ListServices(w http.ResponseWriter, r *http.Request) {
 	_ = app.writeJSON(w, http.StatusOK, app.ServiceRegistry)
 }
 
+// ListLoaded lists all services that we initialized during startup
+func (app *Application) ListLoaded(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, err := w.Write(app.getLoadedServices())
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+}
 func (app *Application) KillService(w http.ResponseWriter, r *http.Request) {
 	type service struct {
 		Id string `json:"id"`

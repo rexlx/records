@@ -15,6 +15,7 @@ func (app *Application) apiRoutes() http.Handler {
 		mux.Use(app.authenticate)
 		// here we can use middleware for anything in the `app` route
 		mux.Get("/runtime", app.ListServices)
+		mux.Get("/runtime/loaded", app.ListLoaded)
 		mux.Post("/kill", app.KillService)
 	})
 	// might need static files later

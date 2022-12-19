@@ -92,19 +92,19 @@ type Store struct {
 }
 
 type ServiceDetails struct {
-	Name      string   `json:"name"`
-	Index     string   `json:"index"`
-	Runtime   int      `json:"runtime"`
-	Refresh   int      `json:"refresh"`
-	ReRun     bool     `json:"rerun"`
-	Scheduled bool     `json:"scheduled"`
-	StartAt   []string `json:"start_at"`
-	ServiceId string
-	Kill      chan interface{}
-	Stream    chan ZincRecordV2
-	InfoLog   *log.Logger
-	ErrorLog  *log.Logger
-	Store     *Store
+	Name      string            `json:"name"`
+	Index     string            `json:"index"`
+	Runtime   int               `json:"runtime"`
+	Refresh   int               `json:"refresh"`
+	ReRun     bool              `json:"rerun"`
+	Scheduled bool              `json:"scheduled"`
+	StartAt   []string          `json:"start_at"`
+	ServiceId string            `json:"id"`
+	Kill      chan interface{}  `json:"-"`
+	Stream    chan ZincRecordV2 `json:"-"`
+	InfoLog   *log.Logger       `json:"-"`
+	ErrorLog  *log.Logger       `json:"-"`
+	Store     *Store            `json:"-"`
 }
 
 type WorkerMap map[string]func(chan ZincRecordV2)
