@@ -7,11 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 
 	"github.com/rexlx/records/source/definitions"
@@ -62,15 +60,8 @@ func (app *Application) getServiceDataById(uid string) (*serviceDetails, error) 
 	return &serviceDetails{}, fmt.Errorf("no data store linked to that id")
 }
 
-func (app *Application) getLoadedServices() []*definitions.ServiceDetails {
-	var vals []*definitions.ServiceDetails
-	svs := reflect.ValueOf(app.Config.Services)
-	types := svs.Type()
-	for i := 0; i < svs.NumField(); i++ {
-		svc := &definitions.ServiceDetails{}
-		log.Println(types, svs, svc)
-	}
-	return vals
+func (app *Application) getLoadedServices() []*serviceDetails {
+	return app.Config.Services
 }
 
 // handleStore sends the records to be indexed (look into zinclabs). additionally
