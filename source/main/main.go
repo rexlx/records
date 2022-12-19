@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"sync"
-	"time"
 
 	"github.com/rexlx/records/source/definitions"
 	"github.com/rexlx/records/source/services"
@@ -73,25 +72,6 @@ func main() {
 		"cpu_monitor":     services.CpuMon,
 	})
 	app.startApi()
-	// this block just keeps the program alive for now
-	for {
-		serviceList := app.getAllServiceData()
-		if len(serviceList) > 0 {
-			app.InfoLog.Println("performing service health check")
-			for k, v := range app.ServiceRegistry {
-				if _, ok := app.StateMap[v]; ok {
-					app.InfoLog.Printf("%v (%v) is running", k, v)
-				} else {
-					app.InfoLog.Printf("this service should be dead.. %v", k)
-					delete(app.ServiceRegistry, k)
-				}
-			}
-			time.Sleep(1800 * time.Second)
-		} else {
-			time.Sleep(1 * time.Second)
-
-		}
-	}
 
 }
 
