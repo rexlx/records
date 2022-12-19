@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -10,32 +9,14 @@ import (
 
 var app *Application
 
-type Store struct {
-	Records []*definitions.ZincRecordV2
-}
-
-type ServiceDetails struct {
-	Name      string   `json:"name"`
-	Index     string   `json:"index"`
-	Runtime   int      `json:"runtime"`
-	Refresh   int      `json:"refresh"`
-	ReRun     bool     `json:"rerun"`
-	Scheduled bool     `json:"scheduled"`
-	StartAt   []string `json:"start_at"`
-	ServiceId string
-	Kill      chan interface{}
-	Stream    chan definitions.ZincRecordV2
-	InfoLog   *log.Logger
-	ErrorLog  *log.Logger
-	Store     *Store
-}
+type serviceDetails definitions.ServiceDetails
 
 // Appreceiver is how the scheduler gets access to app wide data
 func AppReceiver(a *Application) {
 	app = a
 }
 
-func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
+func (s *serviceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 	newStream := make(chan definitions.ZincRecordV2)
 	if err := serviceValidator(s); err != nil {
 		s.ErrorLog.Println(err)

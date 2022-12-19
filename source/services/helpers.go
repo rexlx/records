@@ -49,23 +49,26 @@ func zincAuth(username, password string) string {
 }
 
 const (
-	ErcotRTSC              = "https://www.ercot.com/content/cdr/html/real_time_system_conditions.html"
-	ErcotSPP               = "https://www.ercot.com/content/cdr/html/real_time_spp.html"
-	WeatherUri             = "http://api.weatherapi.com/v1/current.json?key=&q=%v"
-	ZincUri                = "http://127.0.0.1:4080/api/_bulkv2"
-	CurrentFrequency       = 0
-	InstantaneousTimeError = 1
-	BAALExceedances        = 2
-	ActualDemand           = 3
-	Capacity               = 4
-	Wind                   = 5
-	PVGR                   = 6
-	Inertia                = 7
-	DC_E                   = 8
-	DC_L                   = 9
-	DC_N                   = 10
-	DC_R                   = 11
-	DC_S                   = 12
+	CurrentFrequency = iota
+	InstantaneousTimeError
+	BAALExceedances
+	ActualDemand
+	Capacity
+	Wind
+	PVGR
+	Inertia
+	DC_E
+	DC_L
+	DC_N
+	DC_R
+	DC_S
+)
+
+const (
+	ErcotRTSC  = "https://www.ercot.com/content/cdr/html/real_time_system_conditions.html"
+	ErcotSPP   = "https://www.ercot.com/content/cdr/html/real_time_spp.html"
+	WeatherUri = "http://api.weatherapi.com/v1/current.json?key=&q=%v"
+	ZincUri    = "http://127.0.0.1:4080/api/_bulkv2"
 )
 
 type Pair[T, U any] struct {

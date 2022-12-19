@@ -1,5 +1,7 @@
 package definitions
 
+import "log"
+
 type ZincRecordV2 struct {
 	Index   string                   `json:"index"`
 	Records []map[string]interface{} `json:"records"`
@@ -79,14 +81,30 @@ type SysConResponse struct {
 	DC_S                   float32 `json:"dc_s"`
 }
 
-type RawValueStore struct {
-	Spp  []*Spp
-	Rtsc []*SysConResponse
-	Wapi []*WeatherResponse
-}
-
 type JsonResponse struct {
 	Error   bool        `json:"error"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 }
+
+type Store struct {
+	Records []*ZincRecordV2
+}
+
+type ServiceDetails struct {
+	Name      string   `json:"name"`
+	Index     string   `json:"index"`
+	Runtime   int      `json:"runtime"`
+	Refresh   int      `json:"refresh"`
+	ReRun     bool     `json:"rerun"`
+	Scheduled bool     `json:"scheduled"`
+	StartAt   []string `json:"start_at"`
+	ServiceId string
+	Kill      chan interface{}
+	Stream    chan ZincRecordV2
+	InfoLog   *log.Logger
+	ErrorLog  *log.Logger
+	Store     *Store
+}
+
+type WorkerMap map[string]func(chan ZincRecordV2)

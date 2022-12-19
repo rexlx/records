@@ -7,9 +7,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 
 	"github.com/rexlx/records/source/definitions"
@@ -17,27 +19,33 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// registerService adds a service to the application state map
-func (app *Application) registerService(uid string, state *ServiceDetails) {
+// registerService adds a service to the application state map as well as the service registry
+// the service registry is an internal convention and is a map of any service that is or was
+// running since the last start
+func (app *Application) registerService(uid string, state *serviceDetails) {
 	app.Mtx.Lock()
 	defer app.Mtx.Unlock()
 	app.ServiceRegistry[SanitizeServiceName(state.Name)] = uid
 	app.StateMap[uid] = state
 }
 
+// removeService removes a services from the application state map
 func (app *Application) removeService(uid string) {
 	app.Mtx.Lock()
 	defer app.Mtx.Unlock()
 	delete(app.StateMap, uid)
-	for k, v := range app.ServiceRegistry {
-		if uid == v {
-			delete(app.ServiceRegistry, k)
-		}
-	}
+	// keep services in reg for now
+	// for k, v := range app.ServiceRegistry {
+	// 	if uid == v {
+	// 		delete(app.ServiceRegistry, k)
+	// 	}
+	// }
 }
 
-func (app *Application) getAllServiceData() []*ServiceDetails {
-	var svs []*ServiceDetails
+// getAllServiceData returns an unordered list of service state maps
+// i dont know why i need this.
+func (app *Application) getAllServiceData() []*serviceDetails {
+	var svs []*serviceDetails
 	app.Mtx.RLock()
 	defer app.Mtx.RUnlock()
 	for _, svc := range app.StateMap {
@@ -46,21 +54,28 @@ func (app *Application) getAllServiceData() []*ServiceDetails {
 	return svs
 }
 
-func (app *Application) getServiceDataById(uid string) (*ServiceDetails, error) {
+// getServiceDataById returns the state of a specific service
+func (app *Application) getServiceDataById(uid string) (*serviceDetails, error) {
 	if _, ok := app.StateMap[uid]; ok {
 		return app.StateMap[uid], nil
 	}
-	return &ServiceDetails{}, fmt.Errorf("no data store linked to that id")
+	return &serviceDetails{}, fmt.Errorf("no data store linked to that id")
 }
 
-func serviceValidator(s *ServiceDetails) error {
-	if s.Runtime < 1 || s.Refresh < 1 {
-		return fmt.Errorf("wont start service: %v. runtime or refresh set to zero in config", s.Name)
+func (app *Application) getLoadedServices() []*definitions.ServiceDetails {
+	var vals []*definitions.ServiceDetails
+	svs := reflect.ValueOf(app.Config.Services)
+	types := svs.Type()
+	for i := 0; i < svs.NumField(); i++ {
+		svc := &definitions.ServiceDetails{}
+		log.Println(types, svs, svc)
 	}
-	return nil
+	return vals
 }
 
-func (app *Application) handleStore(uid string, store *Store) {
+// handleStore sends the records to be indexed (look into zinclabs). additionally
+// after a given time, it saves its list of records to the specified date dir
+func (app *Application) handleStore(uid string, store *definitions.Store) {
 	if len(store.Records) > 0 {
 		services.SaveRecordToZinc(app.Config.ZincUri, *store.Records[len(store.Records)-1], app.ErrorLog)
 		if len(store.Records) > 99 {
@@ -73,7 +88,8 @@ func (app *Application) handleStore(uid string, store *Store) {
 	app.StateMap[uid].Store = store
 }
 
-func (app *Application) saveStore(uid string, store *Store) {
+// saves storage slice to disk
+func (app *Application) saveStore(uid string, store *definitions.Store) {
 	// now := time.Now().Format("2006-01-02_1504")
 	err := app.handleServiceStorageDir(uid)
 	if err != nil {
@@ -206,4 +222,12 @@ func genRandomString() (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(bytes), nil
+}
+
+// serviceValidator ensures a configured service meets whatever evolving criteria may...evolve
+func serviceValidator(s *serviceDetails) error {
+	if s.Runtime < 1 || s.Refresh < 1 {
+		return fmt.Errorf("wont start service: %v. runtime or refresh set to zero in config", s.Name)
+	}
+	return nil
 }

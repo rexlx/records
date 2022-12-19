@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/rexlx/records/source/definitions"
 	"github.com/rexlx/records/source/services"
 )
 
@@ -18,21 +19,16 @@ type Application struct {
 	Config          *RuntimeConfig
 	ApiKey          string
 	ServiceRegistry map[string]string
-	StateMap        map[string]*ServiceDetails
+	StateMap        map[string]*serviceDetails
 	Mtx             sync.RWMutex
 }
 
 type RuntimeConfig struct {
-	ZincUri  string `json:"zinc_uri"`
-	LogPath  string `json:"logpath"`
-	DataDir  string `json:"data_dir"`
-	Port     int    `json:"api_port"`
-	Services struct {
-		RTSC ServiceDetails `json:"rtsc_monitor"`
-		SPP  ServiceDetails `json:"spp_monitor"`
-		WM   ServiceDetails `json:"wapi_monitor"`
-		RCPU ServiceDetails `json:"cpu_monitor"`
-	} `json:"services"`
+	ZincUri  string            `json:"zinc_uri"`
+	LogPath  string            `json:"logpath"`
+	DataDir  string            `json:"data_dir"`
+	Port     int               `json:"api_port"`
+	Services []*serviceDetails `json:"services"`
 }
 
 func main() {
@@ -58,7 +54,7 @@ func main() {
 
 	infoLog := log.New(file, "info  ", log.Ldate|log.Ltime)
 	errorLog := log.New(file, "error ", log.Ldate|log.Ltime)
-	state := make(map[string]*ServiceDetails)
+	state := make(map[string]*serviceDetails)
 	serviceRegistry := make(map[string]string)
 
 	app := Application{
@@ -70,7 +66,12 @@ func main() {
 		Mtx:             sync.RWMutex{},
 	}
 	AppReceiver(&app)
-	app.startServcies()
+	app.startServcies(definitions.WorkerMap{
+		"weather_monitor": services.GetWeather,
+		"rtsc_monitor":    services.GetRealTimeSysCon,
+		"spp_monitor":     services.GetSPP,
+		"cpu_monitor":     services.CpuMon,
+	})
 	app.startApi()
 	// this block just keeps the program alive for now
 	for {
@@ -104,32 +105,14 @@ func (app *Application) startApi() error {
 	return srv.ListenAndServe()
 }
 
-func (app *Application) startServcies() {
-	// set up real time system condition monitor
-	app.Config.Services.RTSC.InfoLog = app.InfoLog
-	app.Config.Services.RTSC.ErrorLog = app.ErrorLog
-	app.Config.Services.RTSC.Store = &Store{}
-	app.Config.Services.RTSC.Kill = make(chan interface{})
-	go app.Config.Services.RTSC.Run(services.GetRealTimeSysCon)
-
-	// set up settlment point price monitor
-	app.Config.Services.SPP.InfoLog = app.InfoLog
-	app.Config.Services.SPP.ErrorLog = app.ErrorLog
-	app.Config.Services.SPP.Store = &Store{}
-	app.Config.Services.SPP.Kill = make(chan interface{})
-	go app.Config.Services.SPP.Run(services.GetSPP)
-
-	// set up weather monitor
-	app.Config.Services.WM.InfoLog = app.InfoLog
-	app.Config.Services.WM.ErrorLog = app.ErrorLog
-	app.Config.Services.WM.Store = &Store{}
-	app.Config.Services.WM.Kill = make(chan interface{})
-	go app.Config.Services.WM.Run(services.GetWeather)
-
-	// cpu mon
-	app.Config.Services.RCPU.InfoLog = app.InfoLog
-	app.Config.Services.RCPU.ErrorLog = app.ErrorLog
-	app.Config.Services.RCPU.Store = &Store{}
-	app.Config.Services.RCPU.Kill = make(chan interface{})
-	go app.Config.Services.RCPU.Run(services.CpuMon)
+func (app *Application) startServcies(svs definitions.WorkerMap) {
+	for _, i := range app.Config.Services {
+		i.InfoLog = app.InfoLog
+		i.ErrorLog = app.ErrorLog
+		i.Store = &definitions.Store{}
+		i.Kill = make(chan interface{})
+		if _, ok := svs[i.Name]; ok {
+			go i.Run(svs[i.Name])
+		}
+	}
 }
