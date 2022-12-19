@@ -34,11 +34,11 @@ func (app *Application) removeService(uid string) {
 	defer app.Mtx.Unlock()
 	delete(app.StateMap, uid)
 	// keep services in reg for now
-	// for k, v := range app.ServiceRegistry {
-	// 	if uid == v {
-	// 		delete(app.ServiceRegistry, k)
-	// 	}
-	// }
+	for k, v := range app.ServiceRegistry {
+		if uid == v {
+			delete(app.ServiceRegistry, k)
+		}
+	}
 }
 
 // getAllServiceData returns an unordered list of service state maps
@@ -67,6 +67,19 @@ func (app *Application) getLoadedServices() []byte {
 		log.Println(err)
 	}
 	return out
+}
+
+func (app *Application) getDefaults(s *serviceDetails) {
+	app.InfoLog.Println(s, "DBUG")
+	for _, i := range app.Config.Services {
+		if i.Name == s.Name {
+			s.Runtime = i.Runtime
+			s.Refresh = i.Refresh
+			s.ReRun = i.ReRun
+			s.StartAt = i.StartAt
+			app.InfoLog.Println(s, "DBUG")
+		}
+	}
 }
 
 // handleStore sends the records to be indexed (look into zinclabs). additionally
@@ -203,7 +216,7 @@ func (app *Application) validateKey(r *http.Request) (bool, error) {
 		switch {
 		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
 			// invalid password
-			return false, nil
+			return false, errors.New("-")
 		default:
 			return false, err
 		}

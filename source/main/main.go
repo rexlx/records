@@ -23,11 +23,12 @@ type Application struct {
 }
 
 type RuntimeConfig struct {
-	ZincUri  string            `json:"zinc_uri"`
-	LogPath  string            `json:"logpath"`
-	DataDir  string            `json:"data_dir"`
-	Port     int               `json:"api_port"`
-	Services []*serviceDetails `json:"services"`
+	ZincUri   string                 `json:"zinc_uri"`
+	LogPath   string                 `json:"logpath"`
+	DataDir   string                 `json:"data_dir"`
+	Port      int                    `json:"api_port"`
+	Services  []*serviceDetails      `json:"services"`
+	WorkerMap *definitions.WorkerMap `json:"-"`
 }
 
 func main() {
@@ -86,6 +87,7 @@ func (app *Application) startApi() error {
 }
 
 func (app *Application) startServcies(svs definitions.WorkerMap) {
+	app.Config.WorkerMap = &svs
 	for _, i := range app.Config.Services {
 		i.InfoLog = app.InfoLog
 		i.ErrorLog = app.ErrorLog
