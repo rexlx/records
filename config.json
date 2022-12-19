@@ -2,9 +2,9 @@
     "logpath": "records.log",
     "zinc_uri": "http://127.0.0.1:4080/api/_bulkv2",
     "data_dir": "/Users/rxlx/bin/data",
-    "services": {
-        "rtsc_monitor": {
-            "name": "real time system conditions monitor",
+    "api_port": 9990,
+    "services": [ {
+            "name": "rtsc_monitor",
             "index": "ercotsRTSC",
             "runtime": 86400,
             "refresh": 62,
@@ -12,8 +12,8 @@
             "start_at": ["16:20", "America/Chicago"],
             "rerun": true
         },
-        "spp_monitor": {
-            "name": "real time settlement point prices monitor",
+        {
+            "name": "spp_monitor",
             "index": "ErcotSPP",
             "runtime": 85498,
             "refresh": 900,
@@ -21,8 +21,8 @@
             "start_at": ["10:16", "America/Chicago"],
             "rerun": true
         },
-        "wapi_monitor": {
-            "name": "weather montior",
+        {
+            "name": "weather_monitor",
             "index": "verySpecialWeather",
             "runtime": 86400,
             "refresh": 450,
@@ -30,8 +30,8 @@
             "start_at": ["13:42", "America/Chicago"],
             "rerun": true
         },
-        "cpu_monitor": {
-            "name": "rxlx cpu mon",
+        {
+            "name": "cpu_monitor",
             "index": "cpuMonRxlx",
             "runtime": 86400,
             "refresh": 28,
@@ -39,5 +39,5 @@
             "start_at": ["16:20", "America/Chicago"],
             "rerun": true
         }
-    }
+    ]
 }

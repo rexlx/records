@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -10,31 +9,14 @@ import (
 
 var app *Application
 
-type Store struct {
-	Records []*definitions.ZincRecordV2
-}
-
-type ServiceDetails struct {
-	Name      string   `json:"name"`
-	Index     string   `json:"index"`
-	Runtime   int      `json:"runtime"`
-	Refresh   int      `json:"refresh"`
-	ReRun     bool     `json:"rerun"`
-	Scheduled bool     `json:"scheduled"`
-	StartAt   []string `json:"start_at"`
-	ServiceId string
-	Stream    chan definitions.ZincRecordV2
-	InfoLog   *log.Logger
-	ErrorLog  *log.Logger
-	Store     *Store
-}
+type serviceDetails definitions.ServiceDetails
 
 // Appreceiver is how the scheduler gets access to app wide data
 func AppReceiver(a *Application) {
 	app = a
 }
 
-func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
+func (s *serviceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 	newStream := make(chan definitions.ZincRecordV2)
 	if err := serviceValidator(s); err != nil {
 		s.ErrorLog.Println(err)
@@ -42,7 +24,7 @@ func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 	}
 
 	uid := uuid.Must(uuid.NewRandom()).String()
-	app.registerService(s.Name, uid, *s.Store)
+	app.registerService(uid, s)
 
 	s.ServiceId = uid
 	t, z := s.StartAt[0], s.StartAt[1]
@@ -50,9 +32,15 @@ func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 
 	// starts immediately
 	if !s.Scheduled {
+	runtime:
 		for {
 			s.InfoLog.Printf("%v is starting. running for %vs every %vs", s.Name, s.Runtime, s.Refresh)
 			for start := time.Now(); time.Since(start) < time.Second*time.Duration(s.Runtime); {
+				select {
+				case <-s.Kill:
+					break runtime
+				default:
+				}
 				go wkr(newStream)
 				msg := <-newStream
 				s.Store.Records = append(s.Store.Records, &msg)
@@ -70,6 +58,7 @@ func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 
 	if s.Scheduled {
 		s.InfoLog.Printf("%v initialized. waiting for work to start at %v", s.Name, s.StartAt)
+	schedule:
 		for {
 			// this branch waits for scheduled time to occur
 			if time.Now().In(tz).Format("15:04") != t {
@@ -77,6 +66,11 @@ func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 			} else {
 				s.InfoLog.Printf("%v is starting. running for %vs every %vs", s.Name, s.Runtime, s.Refresh)
 				for start := time.Now(); time.Since(start) < time.Second*time.Duration(s.Runtime); {
+					select {
+					case <-s.Kill:
+						break schedule
+					default:
+					}
 					go wkr(newStream)
 					msg := <-newStream
 					s.Store.Records = append(s.Store.Records, &msg)
@@ -85,12 +79,14 @@ func (s *ServiceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 				}
 				if !s.ReRun {
 					s.InfoLog.Println("terminating", s.Name)
-					app.removeService(uid)
+					app.removeService(s.ServiceId)
 					return
 				}
 				s.InfoLog.Println(s.Name, "rotating service")
 			}
 		}
 	}
+	s.InfoLog.Printf("exit condition for %v (%v) reached.", s.Name, s.ServiceId)
+	app.removeService(s.ServiceId)
 
 }
