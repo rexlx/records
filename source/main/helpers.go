@@ -126,7 +126,7 @@ func (app *Application) handleServiceStorageDir(uid string) error {
 	return nil
 }
 
-func (app *Application) errorJSON(w http.ResponseWriter, err error, status ...int) {
+func (app *Application) errorJSON(w http.ResponseWriter, err error, status ...int) error {
 	statusCode := http.StatusBadRequest
 
 	if len(status) > 0 {
@@ -138,6 +138,7 @@ func (app *Application) errorJSON(w http.ResponseWriter, err error, status ...in
 	payload.Message = err.Error()
 
 	app.writeJSON(w, statusCode, payload)
+	return nil
 }
 
 func (app *Application) writeJSON(w http.ResponseWriter, status int, data interface{}, headers ...http.Header) error {
