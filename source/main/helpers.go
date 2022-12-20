@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -64,20 +63,18 @@ func (app *Application) getServiceDataById(uid string) (*serviceDetails, error) 
 func (app *Application) getLoadedServices() []byte {
 	out, err := json.Marshal(app.Config.Services)
 	if err != nil {
-		log.Println(err)
+		app.InfoLog.Println(err)
 	}
 	return out
 }
 
 func (app *Application) getDefaults(s *serviceDetails) {
-	app.InfoLog.Println(s, "DBUG")
 	for _, i := range app.Config.Services {
 		if i.Name == s.Name {
 			s.Runtime = i.Runtime
 			s.Refresh = i.Refresh
 			s.ReRun = i.ReRun
 			s.StartAt = i.StartAt
-			app.InfoLog.Println(s, "DBUG")
 		}
 	}
 }
@@ -175,7 +172,7 @@ func (app *Application) readJSON(w http.ResponseWriter, r *http.Request, data in
 	//--:REX you changed `err := dec.Decode(data)` -> `err := dec.Decode(&data)`
 	err := dec.Decode(data)
 	if err != nil {
-		app.ErrorLog.Println("BRUHhhhhhhhhh")
+		app.ErrorLog.Println("readJSON encountered a fatal error", err)
 		return err
 	}
 

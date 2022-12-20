@@ -8,7 +8,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/rexlx/records/source/definitions"
@@ -33,7 +35,7 @@ func SaveRecordToZinc(zuri string, record definitions.ZincRecordV2, logger *log.
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		logger.Println(err, "hittt")
+		logger.Println("http client failure", err)
 		return
 	}
 	defer res.Body.Close()
@@ -78,7 +80,7 @@ type Pair[T, U any] struct {
 
 func zip[T, U any](ts []T, us []U) []Pair[T, U] {
 	if len(ts) != len(us) {
-		log.Println("bad lengths")
+		log.Println("bad lengths when ziping input")
 		return nil
 	}
 	pairs := make([]Pair[T, U], len(ts))

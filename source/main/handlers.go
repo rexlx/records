@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/rexlx/records/source/definitions"
@@ -75,7 +74,6 @@ func (app *Application) StartService(w http.ResponseWriter, r *http.Request) {
 
 		if _, ok := (*app.Config.WorkerMap)[newService.Name]; ok {
 			wkr := (*app.Config.WorkerMap)[newService.Name]
-			log.Println(newService, "DBUG2")
 			go newService.Run(wkr)
 			msg := jsonResponse{
 				Error:   false,
