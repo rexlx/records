@@ -110,7 +110,7 @@ func Test_serviceValidator(t *testing.T) {
 				t.Errorf("serviceValidator returned unexpected result")
 			}
 		} else {
-			if tc.Runtime < 1 && tc.Refresh < 1 {
+			if tc.Runtime < 1 || tc.Refresh < 1 {
 				t.Errorf("serviceValidator returned unexpected result")
 			}
 		}
