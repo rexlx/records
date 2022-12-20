@@ -25,7 +25,6 @@ func (s *serviceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 
 	uid := uuid.Must(uuid.NewRandom()).String()
 	app.registerService(uid, s)
-
 	s.ServiceId = uid
 	t, z := s.StartAt[0], s.StartAt[1]
 	tz, _ := time.LoadLocation(z)
@@ -34,7 +33,7 @@ func (s *serviceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 	if !s.Scheduled {
 	runtime:
 		for {
-			s.InfoLog.Printf("%v is starting. running for %vs every %vs", s.Name, s.Runtime, s.Refresh)
+			s.InfoLog.Printf("%v (%v) is starting. running for %vs every %vs", s.ServiceId, s.Name, s.Runtime, s.Refresh)
 			for start := time.Now(); time.Since(start) < time.Second*time.Duration(s.Runtime); {
 				select {
 				case <-s.Kill:

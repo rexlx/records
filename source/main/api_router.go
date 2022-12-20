@@ -18,6 +18,8 @@ func (app *Application) apiRoutes() http.Handler {
 		mux.Get("/runtime/loaded", app.ListLoaded)
 		mux.Post("/runtime/kill", app.KillService)
 		mux.Post("/runtime/start", app.StartService)
+
+		mux.Post("/service/store", app.GetStore)
 	})
 	// might need static files later
 	fserver := http.FileServer(http.Dir("./static/"))

@@ -52,6 +52,13 @@ func (app *Application) getAllServiceData() []*serviceDetails {
 	return svs
 }
 
+func (app *Application) getStore(uid string) ([]*definitions.ZincRecordV2, error) {
+	if _, ok := app.StateMap[uid]; ok {
+		return app.StateMap[uid].Store.Records, nil
+	}
+	return []*definitions.ZincRecordV2{}, errors.New("invalid id")
+}
+
 // getServiceDataById returns the state of a specific service
 func (app *Application) getServiceDataById(uid string) (*serviceDetails, error) {
 	if _, ok := app.StateMap[uid]; ok {
