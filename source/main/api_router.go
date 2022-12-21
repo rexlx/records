@@ -20,6 +20,8 @@ func (app *Application) apiRoutes() http.Handler {
 		mux.Post("/runtime/start", app.StartService)
 
 		mux.Post("/service/store", app.GetStore)
+		mux.Post("/service/runtime", app.GetRuntime)
+		mux.Post("/service/errors", app.GetErrorsById)
 	})
 	// might need static files later
 	fserver := http.FileServer(http.Dir("./static/"))

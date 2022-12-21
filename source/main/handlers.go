@@ -3,17 +3,73 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/rexlx/records/source/definitions"
 )
 
 type jsonResponse definitions.JsonResponse
+type service struct {
+	Id string `json:"id"`
+}
 
 // type box map[string]interface{}
 
 // ListServices lists all running services
 func (app *Application) ListServices(w http.ResponseWriter, r *http.Request) {
 	_ = app.writeJSON(w, http.StatusOK, app.ServiceRegistry)
+}
+
+func (app *Application) GetRuntime(w http.ResponseWriter, r *http.Request) {
+	var sid service
+	var data jsonResponse
+	err := app.readJSON(w, r, &sid)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		data.Error = true
+		data.Message = "invalid json"
+		_ = app.writeJSON(w, http.StatusBadRequest, data)
+	}
+	if _, ok := app.StateMap[sid.Id]; ok {
+		rt := time.Since(app.StateMap[sid.Id].Store.Counters.Start)
+		msg := jsonResponse{
+			Error: false,
+			Data:  rt,
+		}
+		_ = app.writeJSON(w, http.StatusOK, msg)
+	} else {
+		msg := jsonResponse{
+			Error:   true,
+			Message: "id does not exist",
+		}
+		_ = app.writeJSON(w, http.StatusBadRequest, msg)
+	}
+}
+
+func (app *Application) GetErrorsById(w http.ResponseWriter, r *http.Request) {
+	var sid service
+	var data jsonResponse
+	err := app.readJSON(w, r, &sid)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		data.Error = true
+		data.Message = "invalid json"
+		_ = app.writeJSON(w, http.StatusBadRequest, data)
+	}
+	if _, ok := app.StateMap[sid.Id]; ok {
+		msg := jsonResponse{
+			Error: false,
+			Data:  app.StateMap[sid.Id].Store.Errors,
+		}
+		_ = app.writeJSON(w, http.StatusOK, msg)
+	} else {
+		msg := jsonResponse{
+			Error:   true,
+			Message: "id does not exist",
+		}
+		_ = app.writeJSON(w, http.StatusBadRequest, msg)
+	}
+
 }
 
 // ListLoaded lists all services that we initialized during startup
@@ -27,9 +83,6 @@ func (app *Application) ListLoaded(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func (app *Application) KillService(w http.ResponseWriter, r *http.Request) {
-	type service struct {
-		Id string `json:"id"`
-	}
 	var sid service
 	var data jsonResponse
 	err := app.readJSON(w, r, &sid)
@@ -49,9 +102,6 @@ func (app *Application) KillService(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *Application) GetStore(w http.ResponseWriter, r *http.Request) {
-	type service struct {
-		Id string `json:"id"`
-	}
 	var sid service
 	var data jsonResponse
 	err := app.readJSON(w, r, &sid)
@@ -67,6 +117,7 @@ func (app *Application) GetStore(w http.ResponseWriter, r *http.Request) {
 		data.Message = err.Error()
 		_ = app.writeJSON(w, http.StatusBadRequest, data)
 	}
+
 	msg := jsonResponse{
 		Error:   false,
 		Message: fmt.Sprintf("fetched store for %v", sid.Id),
