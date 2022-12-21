@@ -89,13 +89,21 @@ func (app *Application) getDefaults(s *serviceDetails) {
 // handleStore sends the records to be indexed (look into zinclabs). additionally
 // after a given time, it saves its list of records to the specified date dir
 func (app *Application) handleStore(uid string, store *definitions.Store) {
-	if len(store.Records) > 0 {
+	if len(store.Records) == app.StateMap[uid].Store.Counters.Signature {
+		err := errors.New("service progressed, but state was unchanged")
+		app.ErrorLog.Println(err)
+		app.StateMap[uid].Store.Errors = append(app.StateMap[uid].Store.Errors, &err)
+		return
+	}
+	if len(store.Records) > app.StateMap[uid].Store.Counters.Signature {
+		app.StateMap[uid].Store.Counters.Signature = len(store.Records)
 		services.SaveRecordToZinc(app.Config.ZincUri, *store.Records[len(store.Records)-1], app.ErrorLog)
-		if len(store.Records) > 99 {
-			var emptyStore []*definitions.ZincRecordV2
-			app.saveStore(uid, store)
-			store.Records = emptyStore
-		}
+	}
+	if len(store.Records) > 99 {
+		var emptyStore []*definitions.ZincRecordV2
+		app.saveStore(uid, store)
+		app.StateMap[uid].Store.Counters.StoreEmptied += 1
+		store.Records = emptyStore
 	}
 	// this needs a sync rw mutex i bet
 	app.StateMap[uid].Store = store

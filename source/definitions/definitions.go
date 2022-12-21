@@ -92,8 +92,16 @@ type JsonResponse struct {
 	Data    interface{} `json:"data"`
 }
 
+type Counters struct {
+	Start        time.Time
+	StoreEmptied int
+	Iterations   int
+	Signature    int
+}
 type Store struct {
-	Records []*ZincRecordV2
+	Records  []*ZincRecordV2
+	Errors   []*error
+	Counters *Counters
 }
 
 type ServiceDetails struct {
@@ -105,6 +113,7 @@ type ServiceDetails struct {
 	Scheduled bool              `json:"scheduled"`
 	StartAt   []string          `json:"start_at"`
 	ServiceId string            `json:"id"`
+	Waiting   bool              `json:"-"`
 	Kill      chan interface{}  `json:"-"`
 	Stream    chan ZincRecordV2 `json:"-"`
 	InfoLog   *log.Logger       `json:"-"`

@@ -33,6 +33,7 @@ func (s *serviceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 	if !s.Scheduled {
 	runtime:
 		for {
+			s.Store.Counters.Start = time.Now()
 			s.InfoLog.Printf("%v (%v) is starting. running for %vs every %vs", s.ServiceId, s.Name, s.Runtime, s.Refresh)
 			for start := time.Now(); time.Since(start) < time.Second*time.Duration(s.Runtime); {
 				select {
@@ -47,10 +48,11 @@ func (s *serviceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 				time.Sleep(time.Duration(s.Refresh) * time.Second)
 			}
 			if !s.ReRun {
-				s.InfoLog.Println("terminating", s.Name)
+				s.InfoLog.Printf("exit condition for %v (%v) reached.", s.Name, s.ServiceId)
 				app.removeService(uid)
 				return
 			}
+			s.Store.Counters.Iterations += 1
 			s.InfoLog.Println(s.Name, "rotating service")
 		}
 	}
@@ -61,8 +63,11 @@ func (s *serviceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 		for {
 			// this branch waits for scheduled time to occur
 			if time.Now().In(tz).Format("15:04") != t {
-				time.Sleep(1 * time.Second)
+				s.Waiting = true
+				time.Sleep(2 * time.Second)
 			} else {
+				s.Waiting = false
+				s.Store.Counters.Start = time.Now()
 				s.InfoLog.Printf("%v is starting. running for %vs every %vs", s.Name, s.Runtime, s.Refresh)
 				for start := time.Now(); time.Since(start) < time.Second*time.Duration(s.Runtime); {
 					select {
@@ -77,10 +82,11 @@ func (s *serviceDetails) Run(wkr func(c chan definitions.ZincRecordV2)) {
 					time.Sleep(time.Duration(s.Refresh) * time.Second)
 				}
 				if !s.ReRun {
-					s.InfoLog.Println("terminating", s.Name)
+					s.InfoLog.Printf("exit condition for %v (%v) reached.", s.Name, s.ServiceId)
 					app.removeService(s.ServiceId)
 					return
 				}
+				s.Store.Counters.Iterations += 1
 				s.InfoLog.Println(s.Name, "rotating service")
 			}
 		}
