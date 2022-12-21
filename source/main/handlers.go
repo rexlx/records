@@ -31,7 +31,7 @@ func (app *Application) GetRuntime(w http.ResponseWriter, r *http.Request) {
 		_ = app.writeJSON(w, http.StatusBadRequest, data)
 	}
 	if _, ok := app.StateMap[sid.Id]; ok {
-		rt := time.Since(app.StateMap[sid.Id].Store.Counters.Start)
+		rt := time.Since(app.StateMap[sid.Id].Store.Counters.Start).Minutes()
 		msg := jsonResponse{
 			Error: false,
 			Data:  rt,
