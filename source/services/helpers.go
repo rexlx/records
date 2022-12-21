@@ -55,6 +55,7 @@ const (
 	InstantaneousTimeError
 	BAALExceedances
 	ActualDemand
+	AvgNetLoad
 	Capacity
 	Wind
 	PVGR

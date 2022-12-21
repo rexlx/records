@@ -49,6 +49,7 @@ func GetRealTimeSysCon(c chan definitions.ZincRecordV2) {
 		InstantaneousTimeError: result[InstantaneousTimeError].Value,
 		BAALExceedances:        result[BAALExceedances].Value,
 		Demand:                 result[ActualDemand].Value,
+		AvgNetLoad:             result[AvgNetLoad].Value,
 		Cap:                    result[Capacity].Value,
 		WindOutput:             result[Wind].Value,
 		PVGR:                   result[PVGR].Value,
