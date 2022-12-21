@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/rexlx/performance"
 	"github.com/rexlx/records/source/definitions"
@@ -45,6 +46,7 @@ func GetRealTimeSysCon(c chan definitions.ZincRecordV2) {
 	result := PowerParser(doc)
 	rtsc_res := definitions.SysConResponse{
 		Error:                  false,
+		Time:                   time.Now(),
 		Freq:                   result[CurrentFrequency].Value,
 		InstantaneousTimeError: result[InstantaneousTimeError].Value,
 		BAALExceedances:        result[BAALExceedances].Value,
