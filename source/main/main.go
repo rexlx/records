@@ -104,6 +104,7 @@ func (app *Application) startServcies(svs definitions.WorkerMap) {
 		i.InfoLog = app.InfoLog
 		i.ErrorLog = app.ErrorLog
 		i.Store = &definitions.Store{}
+		i.Store.Counters = &definitions.Counters{}
 		i.Kill = make(chan interface{})
 		if _, ok := svs[i.Name]; ok {
 			go i.Run(svs[i.Name])
