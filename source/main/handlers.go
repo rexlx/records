@@ -20,6 +20,16 @@ func (app *Application) ListServices(w http.ResponseWriter, r *http.Request) {
 	_ = app.writeJSON(w, http.StatusOK, app.ServiceRegistry)
 }
 
+func (app *Application) ListAllCounters(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, err := w.Write(app.getAllServiceStats())
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+}
+
 func (app *Application) GetRuntime(w http.ResponseWriter, r *http.Request) {
 	var sid service
 	var data jsonResponse

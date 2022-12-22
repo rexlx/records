@@ -67,6 +67,27 @@ func (app *Application) getServiceDataById(uid string) (*serviceDetails, error) 
 	return &serviceDetails{}, fmt.Errorf("no data store linked to that id")
 }
 
+func (app *Application) getAllServiceStats() []byte {
+	type statContainer struct {
+		Name     string
+		Counters *definitions.Counters
+	}
+	var stats []*statContainer
+	for _, svc := range app.StateMap {
+		s := &statContainer{
+			Name:     svc.Name,
+			Counters: svc.Store.Counters,
+		}
+		stats = append(stats, s)
+	}
+	out, err := json.Marshal(stats)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return []byte{}
+	}
+	return out
+}
+
 func (app *Application) getLoadedServices() []byte {
 	out, err := json.Marshal(app.Config.Services)
 	if err != nil {
@@ -91,7 +112,7 @@ func (app *Application) getDefaults(s *serviceDetails) {
 func (app *Application) handleStore(uid string, store *definitions.Store) {
 	if len(store.Records) == app.StateMap[uid].Store.Counters.Signature {
 		err := errors.New("service progressed, but state was unchanged")
-		app.ErrorLog.Println(err)
+		app.ErrorLog.Println(err, uid)
 		app.StateMap[uid].Store.Errors = append(app.StateMap[uid].Store.Errors, &err)
 		return
 	}
@@ -99,7 +120,7 @@ func (app *Application) handleStore(uid string, store *definitions.Store) {
 		app.StateMap[uid].Store.Counters.Signature = len(store.Records)
 		services.SaveRecordToZinc(app.Config.ZincUri, *store.Records[len(store.Records)-1], app.ErrorLog)
 	}
-	if len(store.Records) > 99 {
+	if len(store.Records) > 199 {
 		var emptyStore []*definitions.ZincRecordV2
 		app.saveStore(uid, store)
 		app.StateMap[uid].Store.Counters.StoreEmptied += 1
@@ -111,7 +132,6 @@ func (app *Application) handleStore(uid string, store *definitions.Store) {
 
 // saves storage slice to disk
 func (app *Application) saveStore(uid string, store *definitions.Store) {
-	// now := time.Now().Format("2006-01-02_1504")
 	err := app.handleServiceStorageDir(uid)
 	if err != nil {
 		app.ErrorLog.Println(err)

@@ -18,13 +18,14 @@ func (app *Application) apiRoutes() http.Handler {
 		mux.Get("/runtime/loaded", app.ListLoaded)
 		mux.Post("/runtime/kill", app.KillService)
 		mux.Post("/runtime/start", app.StartService)
+		mux.Post("/runtime/stats", app.ListAllCounters)
 
 		mux.Post("/service/store", app.GetStore)
 		mux.Post("/service/runtime", app.GetRuntime)
 		mux.Post("/service/errors", app.GetErrorsById)
 	})
 	// might need static files later
-	fserver := http.FileServer(http.Dir("./static/"))
-	mux.Handle("/static/*", http.StripPrefix("/static", fserver))
+	// fserver := http.FileServer(http.Dir("./static/"))
+	// mux.Handle("/static/*", http.StripPrefix("/static", fserver))
 	return mux
 }
