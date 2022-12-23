@@ -28,7 +28,7 @@ func SaveRecordToZinc(zuri string, record definitions.ZincRecordV2, logger *log.
 	req, err := http.NewRequest(http.MethodPost, zuri, bytes.NewBuffer([]byte(out)))
 	req.Header.Set("Content-Type", "application/json")
 	// ideally we'd be storing secrets in a secrets manager, this is for dev purposes
-	req.Header.Add("Authorization", "Basic "+zincAuth("admin", os.Getenv("ZINC_API_PWD")))
+	req.Header.Add("Authorization", "Basic "+basicAuth("admin", os.Getenv("ZINC_API_PWD")))
 	if err != nil {
 		logger.Println(err)
 		return
@@ -45,7 +45,7 @@ func SaveRecordToZinc(zuri string, record definitions.ZincRecordV2, logger *log.
 	}
 }
 
-func zincAuth(username, password string) string {
+func basicAuth(username, password string) string {
 	auth := username + ":" + password
 	return base64.StdEncoding.EncodeToString([]byte(auth))
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -124,6 +125,7 @@ func (app *Application) handleStore(uid string, store *definitions.Store) {
 		var emptyStore []*definitions.ZincRecordV2
 		app.saveStore(uid, store)
 		app.StateMap[uid].Store.Counters.StoreEmptied += 1
+		app.StateMap[uid].Store.Counters.Signature = 0
 		store.Records = emptyStore
 	}
 	// this needs a sync rw mutex i bet
@@ -231,10 +233,41 @@ func (app *Application) createApiKey() {
 		return
 	}
 	app.ApiKey = string(key)
-	app.InfoLog.Println("first time admin key:", val)
+	app.PlaceKey(&val)
+}
+
+func (app *Application) PlaceKey(key *string) {
+	type payload struct {
+		Key string `json:"key"`
+	}
+	var pl payload
+	pl.Key = *key
+	out, err := json.Marshal(pl)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodPost, os.Getenv("KEY_STORE"), bytes.NewBuffer([]byte(out)))
+	req.Header.Set("Content-Type", "application/json")
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		app.ErrorLog.Println("http client failure", err)
+		return
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		app.ErrorLog.Println("got an unexpected status code", res.StatusCode)
+		return
+	}
 }
 
 func (app *Application) validateKey(r *http.Request) (bool, error) {
+	app.InfoLog.Printf("ACCESS : validating request for %v", r.RemoteAddr)
 	header := r.Header.Get("Authorization")
 	if header == "" {
 		return false, errors.New("no auth headers")
@@ -244,16 +277,22 @@ func (app *Application) validateKey(r *http.Request) (bool, error) {
 	if len(values) != 2 || values[0] != "Bearer" {
 		return false, errors.New("bad auth headers")
 	}
+
+	if len(values[1]) != 40 {
+		return false, errors.New("that token isn't tokeny enough")
+	}
 	err := bcrypt.CompareHashAndPassword([]byte(app.ApiKey), []byte(values[1]))
 	if err != nil {
 		switch {
 		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
 			// invalid password
+			app.InfoLog.Printf("ACCESS : failed authentication %v", r.RemoteAddr)
 			return false, errors.New("-")
 		default:
 			return false, err
 		}
 	}
+	app.InfoLog.Printf("ACCESS : successful authentication %v", r.RemoteAddr)
 	return true, nil
 }
 

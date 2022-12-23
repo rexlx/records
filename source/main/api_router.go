@@ -16,9 +16,9 @@ func (app *Application) apiRoutes() http.Handler {
 		// here we can use middleware for anything in the `app` route
 		mux.Get("/runtime", app.ListServices)
 		mux.Get("/runtime/loaded", app.ListLoaded)
+		mux.Get("/runtime/stats", app.ListAllCounters)
 		mux.Post("/runtime/kill", app.KillService)
 		mux.Post("/runtime/start", app.StartService)
-		mux.Post("/runtime/stats", app.ListAllCounters)
 
 		mux.Post("/service/store", app.GetStore)
 		mux.Post("/service/runtime", app.GetRuntime)
