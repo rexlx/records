@@ -230,3 +230,21 @@ func CpuMon(c chan definitions.ZincRecordV2) {
 		Records: envelope,
 	}
 }
+
+func PowerMonitor(c chan definitions.ZincRecordV2) {
+	newChan := make(chan definitions.ZincRecordV2)
+	var vals []map[string]interface{}
+	go GetSPP(newChan)
+	msg := <-newChan
+	vals = append(vals, msg.Records...)
+	go GetRealTimeSysCon(newChan)
+	msg = <-newChan
+	vals = append(vals, msg.Records...)
+	go GetWeather(newChan)
+	msg = <-newChan
+	vals = append(vals, msg.Records...)
+	c <- definitions.ZincRecordV2{
+		Index:   "PowerMonitor",
+		Records: vals,
+	}
+}
