@@ -232,17 +232,30 @@ func CpuMon(c chan definitions.ZincRecordV2) {
 }
 
 func PowerMonitor(c chan definitions.ZincRecordV2) {
+	var container struct {
+		Spp     []map[string]interface{} `json:"prices"`
+		Rtsc    []map[string]interface{} `json:"system"`
+		Weather []map[string]interface{} `json:"weather"`
+	}
 	newChan := make(chan definitions.ZincRecordV2)
 	var vals []map[string]interface{}
 	go GetSPP(newChan)
 	msg := <-newChan
-	vals = append(vals, msg.Records...)
+	container.Spp = append(container.Spp, msg.Records...)
 	go GetRealTimeSysCon(newChan)
 	msg = <-newChan
-	vals = append(vals, msg.Records...)
+	container.Rtsc = append(container.Rtsc, msg.Records...)
 	go GetWeather(newChan)
 	msg = <-newChan
-	vals = append(vals, msg.Records...)
+	container.Weather = append(container.Weather, msg.Records...)
+
+	var tmp map[string]interface{}
+	out, err := json.Marshal(container)
+	if err != nil {
+		log.Println(err)
+	}
+	json.Unmarshal(out, &tmp)
+	vals = append(vals, tmp)
 	c <- definitions.ZincRecordV2{
 		Index:   "PowerMonitor",
 		Records: vals,
