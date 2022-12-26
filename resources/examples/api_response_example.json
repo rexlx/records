@@ -1,0 +1,288 @@
+{
+    "took": 2,
+    "timed_out": false,
+    "_shards": {
+        "total": 3,
+        "successful": 3,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": {
+            "value": 34
+        },
+        "max_score": 1,
+        "hits": [
+            {
+                "_index": "202212-ErcotSPP",
+                "_type": "_doc",
+                "_id": "1UFOqwgmW1a",
+                "_score": 1,
+                "@timestamp": "2022-12-24T04:23:11.43251456Z",
+                "_source": {
+                    "Date": "12/23/2022 2215",
+                    "HbBusAvg": 201.58,
+                    "HbHouston": 191.5,
+                    "HbHubAvg": 200.68,
+                    "HbNorth": 202.18,
+                    "HbPan": 202.62,
+                    "HbSouth": 206.16,
+                    "HbWest": 202.87,
+                    "LzAen": 205.03,
+                    "LzCps": 205.91,
+                    "LzHouston": 201.57,
+                    "LzLcra": 205.1,
+                    "LzNorth": 205.08,
+                    "LzRaybn": 351.5,
+                    "LzSouth": 250.92,
+                    "LzWest": 203.11
+                }
+            },
+            {
+                "_index": "202212-ErcotSPP",
+                "_type": "_doc",
+                "_id": "1UFMhzjDAn6",
+                "_score": 1,
+                "@timestamp": "2022-12-24T03:53:10.982309632Z",
+                "_source": {
+                    "Date": "12/23/2022 2145",
+                    "HbBusAvg": 222.84,
+                    "HbHouston": 215.05,
+                    "HbHubAvg": 222.17,
+                    "HbNorth": 223.24,
+                    "HbPan": 223.62,
+                    "HbSouth": 226.54,
+                    "HbWest": 223.84,
+                    "LzAen": 225.68,
+                    "LzCps": 227.16,
+                    "LzHouston": 222.96,
+                    "LzLcra": 225.69,
+                    "LzNorth": 226.19,
+                    "LzRaybn": 374,
+                    "LzSouth": 306.27,
+                    "LzWest": 224.06
+                }
+            },
+            {
+                "_index": "202212-ErcotSPP",
+                "_type": "_doc",
+                "_id": "1UFLd4gUuVW",
+                "_score": 1,
+                "@timestamp": "2022-12-24T03:38:10.414593536Z",
+                "_source": {
+                    "Date": "12/23/2022 2130",
+                    "HbBusAvg": 421.55,
+                    "HbHouston": 402.53,
+                    "HbHubAvg": 420.17,
+                    "HbNorth": 423,
+                    "HbPan": 426.22,
+                    "HbSouth": 427.33,
+                    "HbWest": 427.82,
+                    "LzAen": 424.03,
+                    "LzCps": 473.08,
+                    "LzHouston": 415.1,
+                    "LzLcra": 421.23,
+                    "LzNorth": 426.1,
+                    "LzRaybn": 573.54,
+                    "LzSouth": 507.43,
+                    "LzWest": 429.63
+                }
+            },
+            {
+                "_index": "202212-ErcotSPP",
+                "_type": "_doc",
+                "_id": "1UFK8ACbRUk",
+                "_score": 1,
+                "@timestamp": "2022-12-24T03:23:10.149810944Z",
+                "_source": {
+                    "Date": "12/23/2022 2115",
+                    "HbBusAvg": 916.08,
+                    "HbHouston": 869.27,
+                    "HbHubAvg": 911.71,
+                    "HbNorth": 919.76,
+                    "HbPan": 922.36,
+                    "HbSouth": 934.18,
+                    "HbWest": 923.65,
+                    "LzAen": 927.7,
+                    "LzCps": 943,
+                    "LzHouston": 911.02,
+                    "LzLcra": 927.13,
+                    "LzNorth": 922.93,
+                    "LzRaybn": 1070.56,
+                    "LzSouth": 1013.94,
+                    "LzWest": 924.86
+                }
+            },
+            {
+                "_index": "202212-ErcotSPP",
+                "_type": "_doc",
+                "_id": "1UFJ45H7WYU",
+                "_score": 1,
+                "@timestamp": "2022-12-24T03:08:09.608752384Z",
+                "_source": {
+                    "Date": "12/23/2022 2100",
+                    "HbBusAvg": 1229.88,
+                    "HbHouston": 1170.7,
+                    "HbHubAvg": 1224.25,
+                    "HbNorth": 1234.37,
+                    "HbPan": 1236.73,
+                    "HbSouth": 1253.96,
+                    "HbWest": 1237.96,
+                    "LzAen": 1245.61,
+                    "LzCps": 1247.34,
+                    "LzHouston": 1224.72,
+                    "LzLcra": 1245.96,
+                    "LzNorth": 1237.54,
+                    "LzRaybn": 1386.98,
+                    "LzSouth": 1334.21,
+                    "LzWest": 1238.95
+                }
+            },
+            {
+                "_index": "202212-ErcotSPP",
+                "_type": "_doc",
+                "_id": "1UFHZCUUiVG",
+                "_score": 1,
+                "@timestamp": "2022-12-24T02:53:09.535395584Z",
+                "_source": {
+                    "Date": "12/23/2022 2045",
+                    "HbBusAvg": 1359.82,
+                    "HbHouston": 1292.34,
+                    "HbHubAvg": 1353.34,
+                    "HbNorth": 1365.13,
+                    "HbPan": 1367.85,
+                    "HbSouth": 1386.71,
+                    "HbWest": 1369.19,
+                    "LzAen": 1377.69,
+                    "LzCps": 1379.82,
+                    "LzHouston": 1354.37,
+                    "LzLcra": 1378.06,
+                    "LzNorth": 1368.38,
+                    "LzRaybn": 1518.2,
+                    "LzSouth": 1465.1,
+                    "LzWest": 1370.28
+                }
+            },
+            {
+                "_index": "202212-ErcotSPP",
+                "_type": "_doc",
+                "_id": "1UFGV82XYqY",
+                "_score": 1,
+                "@timestamp": "2022-12-24T02:38:09.005772288Z",
+                "_source": {
+                    "Date": "12/23/2022 2030",
+                    "HbBusAvg": 1264.75,
+                    "HbHouston": 1194.51,
+                    "HbHubAvg": 1257.91,
+                    "HbNorth": 1270.63,
+                    "HbPan": 1273.46,
+                    "HbSouth": 1291.74,
+                    "HbWest": 1274.77,
+                    "LzAen": 1283.45,
+                    "LzCps": 1284.36,
+                    "LzHouston": 1260,
+                    "LzLcra": 1283.77,
+                    "LzNorth": 1273.87,
+                    "LzRaybn": 1421.36,
+                    "LzSouth": 1366.21,
+                    "LzWest": 1275.85
+                }
+            },
+            {
+                "_index": "202212-ErcotSPP",
+                "_type": "_doc",
+                "_id": "1UFFQD73g7m",
+                "_score": 1,
+                "@timestamp": "2022-12-24T02:23:08.461698816Z",
+                "_source": {
+                    "Date": "12/23/2022 2015",
+                    "HbBusAvg": 719.33,
+                    "HbHouston": 685.71,
+                    "HbHubAvg": 716.1,
+                    "HbNorth": 721.99,
+                    "HbPan": 723.37,
+                    "HbSouth": 732.69,
+                    "HbWest": 724.03,
+                    "LzAen": 728.72,
+                    "LzCps": 729.1,
+                    "LzHouston": 717.36,
+                    "LzLcra": 728.9,
+                    "LzNorth": 725.03,
+                    "LzRaybn": 874.2,
+                    "LzSouth": 809,
+                    "LzWest": 724.59
+                }
+            },
+            {
+                "_index": "202212-ErcotSPP",
+                "_type": "_doc",
+                "_id": "1UFEMaBRxS0",
+                "_score": 1,
+                "@timestamp": "2022-12-24T02:08:08.448142336Z",
+                "_source": {
+                    "Date": "12/23/2022 2000",
+                    "HbBusAvg": 1031.48,
+                    "HbHouston": 1031.27,
+                    "HbHubAvg": 1031.68,
+                    "HbNorth": 1031.06,
+                    "HbPan": 1031.65,
+                    "HbSouth": 1032.39,
+                    "HbWest": 1031.99,
+                    "LzAen": 1031.05,
+                    "LzCps": 1027.03,
+                    "LzHouston": 1031.21,
+                    "LzLcra": 1030.65,
+                    "LzNorth": 1033.92,
+                    "LzRaybn": 1184.32,
+                    "LzSouth": 1106.12,
+                    "LzWest": 1032.33
+                }
+            },
+            {
+                "_index": "202212-ErcotSPP",
+                "_type": "_doc",
+                "_id": "1UFDHHOvviw",
+                "_score": 1,
+                "@timestamp": "2022-12-24T01:53:08.371419136Z",
+                "_source": {
+                    "Date": "12/23/2022 1945",
+                    "HbBusAvg": 1199.55,
+                    "HbHouston": 1178.15,
+                    "HbHubAvg": 1197.63,
+                    "HbNorth": 1201.01,
+                    "HbPan": 1202.36,
+                    "HbSouth": 1208.34,
+                    "HbWest": 1203.03,
+                    "LzAen": 1204.7,
+                    "LzCps": 1201.59,
+                    "LzHouston": 1197.7,
+                    "LzLcra": 1204.47,
+                    "LzNorth": 1204,
+                    "LzRaybn": 1352.95,
+                    "LzSouth": 1281.16,
+                    "LzWest": 1203.62
+                }
+            }
+        ]
+    },
+    "aggregations": {
+        "avg_bus": {
+            "value": 1440.639705882353
+        },
+        "avg_hub": {
+            "value": 1429.8117647058823
+        },
+        "max_bus": {
+            "value": 3742.84
+        },
+        "max_hub": {
+            "value": 3701.72
+        },
+        "min_bus": {
+            "value": 201.58
+        },
+        "min_hub": {
+            "value": 200.68
+        }
+    }
+}

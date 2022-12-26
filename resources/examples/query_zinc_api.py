@@ -12,8 +12,8 @@ from datetime import datetime as dt
 from requests.auth import HTTPBasicAuth
 from datetime import timedelta
 
-index = "ErcotSPP"
 # i store my indexes by year month - name: 202212-IndexName
+index = "ErcotSPP"
 index = f"{dt.now().strftime('%Y%m')}-{index}"
 
 # if you want to include date ranges, these give you the last month
@@ -31,24 +31,36 @@ q = {
         "search_type": "querystring",
         "query": 
         {
-            "term": "LzHouston:>100",
+            "term": "LzHouston:>200",
 
         },
         "sort_fields": ["-@timestamp"],
         "from": 0,
-        "max_results": 100,
+        "max_results": 10,
         "aggs": {
-            "max_SPP": {
+            "max_bus": {
                 "agg_type": "max",
-                "field": "LzHouston"
+                "field": "HbBusAvg"
                 },
-            "min_SPP": {
+            "min_bus": {
                 "agg_type": "min",
-                "field": "LzHouston"
+                "field": "HbBusAvg"
                 },
-            "avg_SPP": {
+            "avg_bus": {
                 "agg_type": "avg",
-                "field": "LzHouston"
+                "field": "HbBusAvg"
+                },
+            "max_hub": {
+                "agg_type": "max",
+                "field": "HbHubAvg"
+                },
+            "min_hub": {
+                "agg_type": "min",
+                "field": "HbHubAvg"
+                },
+            "avg_hub": {
+                "agg_type": "avg",
+                "field": "HbHubAvg"
                 }
         },
         "_source": []
@@ -56,5 +68,6 @@ q = {
 
 # post the query string to the uri using the auth object
 res = r.post(uri, auth=a, data=json.dumps(q))
-
-print(res.text)
+parsed_res = json.loads(res.text)
+nicer_res = json.dumps(parsed_res, indent=4)
+print(nicer_res)
