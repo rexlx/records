@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-This servers as very simple example of how to use the zinc api.
+This servers as a very simple example of how to use the zinc api.
 
 please refer to the docs for more advanced examples: https://docs.zincsearch.com
 https://github.com/zinclabs/zinc
