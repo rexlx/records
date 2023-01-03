@@ -233,17 +233,19 @@ func (app *Application) createApiKey() {
 		return
 	}
 	app.ApiKey = string(key)
-	app.PlaceKey(&val)
+	app.PlaceKey(&val, &app.Id)
 }
 
-func (app *Application) PlaceKey(key *string) {
+func (app *Application) PlaceKey(key, name *string) {
 	type payload struct {
 		TestPhrase string `json:"test_phrase"`
 		Key        string `json:"key"`
+		Name       string `json:"name"`
 	}
 	var pl payload
 	pl.TestPhrase = os.Getenv("CHALLENGE")
 	pl.Key = *key
+	pl.Name = *name
 	out, err := json.Marshal(pl)
 	if err != nil {
 		app.ErrorLog.Println(err)
