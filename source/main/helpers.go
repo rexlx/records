@@ -108,6 +108,39 @@ func (app *Application) getDefaults(s *serviceDetails) {
 	}
 }
 
+func (app *Application) NameApplication() {
+	url := `https://namer.nullferatu.com`
+	var pl struct {
+		Data string `json:"data"`
+	}
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+
+	defer res.Body.Close()
+
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+	err = json.Unmarshal(data, &pl)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+	app.Id = pl.Data
+}
+
 // handleStore sends the records to be indexed (look into zinclabs). additionally
 // after a given time, it saves its list of records to the specified date dir
 func (app *Application) handleStore(uid string, store *definitions.Store) {

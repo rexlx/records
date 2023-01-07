@@ -57,20 +57,12 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	// initialize a few things our app will need
-	val, err := genRandomString()
-	if err != nil {
-		app.ErrorLog.Println(err)
-		return
-	}
 	infoLog := log.New(file, "info  ", log.Ldate|log.Ltime)
 	errorLog := log.New(file, "error ", log.Ldate|log.Ltime)
 	state := make(map[string]*serviceDetails)
 	serviceRegistry := make(map[string]string)
 	// init the new configured app
 	app := Application{
-		Id:              val,
 		Config:          &config,
 		ServiceRegistry: serviceRegistry,
 		InfoLog:         infoLog,
@@ -78,6 +70,7 @@ func main() {
 		StateMap:        state,
 		Mtx:             sync.RWMutex{},
 	}
+	app.NameApplication()
 	// this is how we pass the instance of this application to the scheduler
 	AppReceiver(&app)
 	// this is where we define our service to function map...for now
