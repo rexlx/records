@@ -33,7 +33,7 @@ func (app *Application) removeService(uid string) {
 	app.Mtx.Lock()
 	defer app.Mtx.Unlock()
 	delete(app.StateMap, uid)
-	// keep services in reg for now
+	// also remove from registry, this may change in the future idk
 	for k, v := range app.ServiceRegistry {
 		if uid == v {
 			delete(app.ServiceRegistry, k)
@@ -42,7 +42,6 @@ func (app *Application) removeService(uid string) {
 }
 
 // getAllServiceData returns an unordered list of service state maps
-// i dont know why i need this.
 func (app *Application) getAllServiceData() []*serviceDetails {
 	var svs []*serviceDetails
 	app.Mtx.RLock()
@@ -53,6 +52,7 @@ func (app *Application) getAllServiceData() []*serviceDetails {
 	return svs
 }
 
+// getStore returns a list of records if they exist or an error
 func (app *Application) getStore(uid string) ([]*definitions.ZincRecordV2, error) {
 	if _, ok := app.StateMap[uid]; ok {
 		return app.StateMap[uid].Store.Records, nil
@@ -68,11 +68,13 @@ func (app *Application) getServiceDataById(uid string) (*serviceDetails, error) 
 	return &serviceDetails{}, fmt.Errorf("no data store linked to that id")
 }
 
-func (app *Application) getAllServiceStats() []byte {
+// getAllServiceCounters returns a list of all counters premarshalled into bytes
+func (app *Application) getAllServiceCounters() []byte {
 	type statContainer struct {
-		Name     string
-		Counters *definitions.Counters
+		Name     string                `json:"name"`
+		Counters *definitions.Counters `json:"counters"`
 	}
+
 	var stats []*statContainer
 	for _, svc := range app.StateMap {
 		s := &statContainer{
@@ -89,6 +91,7 @@ func (app *Application) getAllServiceStats() []byte {
 	return out
 }
 
+// getLoadedServices returns a list of services premarshalled into bytes
 func (app *Application) getLoadedServices() []byte {
 	out, err := json.Marshal(app.Config.Services)
 	if err != nil {
@@ -97,6 +100,8 @@ func (app *Application) getLoadedServices() []byte {
 	return out
 }
 
+// getDefaults effectively (or perhaps rather, is intended to) sets a service details
+// to that of a matching service loaded into the service list
 func (app *Application) getDefaults(s *serviceDetails) {
 	for _, i := range app.Config.Services {
 		if i.Name == s.Name {
@@ -108,7 +113,9 @@ func (app *Application) getDefaults(s *serviceDetails) {
 	}
 }
 
-func (app *Application) NameApplication() {
+// nameApplication fetches an adjective-noun style random name from an api and sets
+// the apps ID to that (and thus, the key file name in the bucket)
+func (app *Application) nameApplication() {
 	url := `https://namer.nullferatu.com`
 	var pl struct {
 		Data string `json:"data"`
@@ -141,8 +148,7 @@ func (app *Application) NameApplication() {
 	app.Id = pl.Data
 }
 
-// handleStore sends the records to be indexed (look into zinclabs). additionally
-// after a given time, it saves its list of records to the specified date dir
+// handleStore sends the records to be indexed (look into zinclabs).
 func (app *Application) handleStore(uid string, store *definitions.Store) {
 	if len(store.Records) == app.StateMap[uid].Store.Counters.Signature {
 		err := errors.New("service progressed, but state was unchanged")
@@ -156,7 +162,8 @@ func (app *Application) handleStore(uid string, store *definitions.Store) {
 	}
 	if len(store.Records) > 199 {
 		var emptyStore []*definitions.ZincRecordV2
-		app.saveStore(uid, store)
+		// saveStore slated for removal
+		// app.saveStore(uid, store)
 		app.StateMap[uid].Store.Counters.StoreEmptied += 1
 		app.StateMap[uid].Store.Counters.Signature = 0
 		store.Records = emptyStore
@@ -165,7 +172,7 @@ func (app *Application) handleStore(uid string, store *definitions.Store) {
 	app.StateMap[uid].Store = store
 }
 
-// saves storage slice to disk
+// saves slice to disk. this was for initial testing, slated for removal
 func (app *Application) saveStore(uid string, store *definitions.Store) {
 	err := app.handleServiceStorageDir(uid)
 	if err != nil {
@@ -183,10 +190,12 @@ func (app *Application) saveStore(uid string, store *definitions.Store) {
 	enc.Encode(store.Records)
 }
 
+// SanitizeServiceName replaces white space with underscores
 func SanitizeServiceName(name string) string {
 	return strings.ReplaceAll(name, " ", "_")
 }
 
+// handleServiceStorageDir creates a directory if it doesnt exist.
 func (app *Application) handleServiceStorageDir(uid string) error {
 	dasPath := filepath.Join(app.Config.DataDir, uid)
 	err := os.MkdirAll(dasPath, os.ModePerm)
@@ -196,6 +205,7 @@ func (app *Application) handleServiceStorageDir(uid string) error {
 	return nil
 }
 
+// errorJSON writes an error message to the responseWriter
 func (app *Application) errorJSON(w http.ResponseWriter, err error, status ...int) error {
 	statusCode := http.StatusBadRequest
 
@@ -211,6 +221,7 @@ func (app *Application) errorJSON(w http.ResponseWriter, err error, status ...in
 	return nil
 }
 
+// writeJSON writes a message to the responseWriter
 func (app *Application) writeJSON(w http.ResponseWriter, status int, data interface{}, headers ...http.Header) error {
 	var out []byte
 	output, err := json.Marshal(data)
@@ -235,6 +246,7 @@ func (app *Application) writeJSON(w http.ResponseWriter, status int, data interf
 	return nil
 }
 
+// readJSON reads and decodes the body of the http request
 func (app *Application) readJSON(w http.ResponseWriter, r *http.Request, data interface{}) error {
 	// 5.9MiB
 	maxBytes := 6206016
@@ -254,29 +266,33 @@ func (app *Application) readJSON(w http.ResponseWriter, r *http.Request, data in
 	return nil
 }
 
+// createApiKey creates a 40 character api key
 func (app *Application) createApiKey() {
+	// generate our random 40 ch hex string
 	val, err := genRandomString()
 	if err != nil {
 		app.ErrorLog.Println(err)
 		return
 	}
+	// create our hash, but use a min cost of 12 instead of 10
 	key, err := bcrypt.GenerateFromPassword([]byte(val), 12)
 	if err != nil {
 		app.ErrorLog.Println(err)
 		return
 	}
+	// that is our api key
 	app.ApiKey = string(key)
+	// and no one shall know but us
 	app.PlaceKey(&val, &app.Id)
 }
 
+// PlaceKey writes an api key to a file given that file name
 func (app *Application) PlaceKey(key, name *string) {
 	type payload struct {
-		TestPhrase string `json:"test_phrase"`
-		Key        string `json:"key"`
-		Name       string `json:"name"`
+		Key  string `json:"key"`
+		Name string `json:"name"`
 	}
 	var pl payload
-	pl.TestPhrase = os.Getenv("CHALLENGE")
 	pl.Key = *key
 	pl.Name = *name
 	out, err := json.Marshal(pl)
@@ -303,6 +319,9 @@ func (app *Application) PlaceKey(key, name *string) {
 	}
 }
 
+// validateKey compares the Bearer token against the hash stored as the key
+// it is also the middleware used to authenticate anything in the `/app` route.
+// this is expensive around ~350ms
 func (app *Application) validateKey(r *http.Request) (bool, error) {
 	app.InfoLog.Printf("ACCESS : validating request for %v", r.RemoteAddr)
 	header := r.Header.Get("Authorization")
@@ -315,9 +334,12 @@ func (app *Application) validateKey(r *http.Request) (bool, error) {
 		return false, errors.New("bad auth headers")
 	}
 
+	// ensuring the len is what we expect is an unnecessary step but also a very quick way
+	// to deter unwanted access before we compare the hash, the most cpu intensive part of this
 	if len(values[1]) != 40 {
 		return false, errors.New("that token isn't tokeny enough")
 	}
+	// this is what costs us so much
 	err := bcrypt.CompareHashAndPassword([]byte(app.ApiKey), []byte(values[1]))
 	if err != nil {
 		switch {
@@ -333,6 +355,7 @@ func (app *Application) validateKey(r *http.Request) (bool, error) {
 	return true, nil
 }
 
+// genRandomString creates the 40 ch hex string needed for the api key
 func genRandomString() (string, error) {
 	// 40 hex chars
 	bytes := make([]byte, 20)

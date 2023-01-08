@@ -13,8 +13,6 @@ type service struct {
 	Id string `json:"id"`
 }
 
-// type box map[string]interface{}
-
 // ListServices lists all running services
 func (app *Application) ListServices(w http.ResponseWriter, r *http.Request) {
 	_ = app.writeJSON(w, http.StatusOK, app.ServiceRegistry)
@@ -23,7 +21,7 @@ func (app *Application) ListServices(w http.ResponseWriter, r *http.Request) {
 func (app *Application) ListAllCounters(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	_, err := w.Write(app.getAllServiceStats())
+	_, err := w.Write(app.getAllServiceCounters())
 	if err != nil {
 		app.ErrorLog.Println(err)
 		return

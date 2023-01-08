@@ -70,7 +70,7 @@ func main() {
 		StateMap:        state,
 		Mtx:             sync.RWMutex{},
 	}
-	app.NameApplication()
+	app.nameApplication()
 	// this is how we pass the instance of this application to the scheduler
 	AppReceiver(&app)
 	// this is where we define our service to function map...for now
